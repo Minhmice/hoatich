@@ -4,3 +4,4 @@ dist
 DEMO_assets
 .DS_Store
 *.local
+.vite
