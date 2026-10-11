@@ -1,0 +1,22 @@
+{
+  "name": "hoatich",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && npm run validate:content && vite build",
+    "test": "vitest run",
+    "validate:content": "tsx src/game/content/validateContentCli.ts"
+  },
+  "dependencies": {
+    "phaser": "3.90.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.10",
+    "tsx": "4.19.3",
+    "typescript": "5.7.2",
+    "vite": "6.3.1",
+    "vitest": "3.0.8"
+  }
+}

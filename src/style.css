@@ -1,0 +1,312 @@
+:root {
+  color-scheme: light;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: calc(16px * var(--font-scale, 1));
+  color: #2b3020;
+  background: #ede6ce;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  min-width: 320px;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  background: #ede6ce;
+  color: #2b3020;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+#app {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ede6ce;
+}
+
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+
+::selection { background: #69774c; color: #fffdf3; }
+:focus-visible {
+  outline: 3px solid #254f58;
+  outline-offset: 3px;
+}
+
+body::-webkit-scrollbar, .journal-content::-webkit-scrollbar { width: 12px; }
+body::-webkit-scrollbar-track, .journal-content::-webkit-scrollbar-track { background: #dcd2b8; }
+body::-webkit-scrollbar-thumb, .journal-content::-webkit-scrollbar-thumb { background: #68724f; border: 3px solid #dcd2b8; border-radius: 12px; }
+
+#game-container, .game-container, #game-root {
+  position: relative;
+  width: min(100%, 1440px);
+  height: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.game-shell {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+  pointer-events: none;
+}
+
+#game-container canvas,
+.game-container canvas {
+  display: block;
+}
+
+.game-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+.game-ui > * { pointer-events: auto; }
+
+.game-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .9rem clamp(1rem, 2vw, 2rem);
+  color: #fff9e9;
+  background: rgba(43, 48, 32, .94);
+  box-shadow: 0 3px 12px rgba(31, 31, 20, .22);
+}
+.game-header h1, .game-header p { margin: 0; }
+.game-header h1 { font-size: clamp(1.15rem, 2vw, 1.6rem); letter-spacing: -.02em; }
+.game-header p { color: #e7d8a3; font-size: .92rem; }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .55rem;
+  padding: .75rem clamp(1rem, 2vw, 2rem);
+  background: rgba(255, 250, 234, .94);
+  border-bottom: 1px solid #a8a076;
+}
+.toolbar button, .flower-button, .bouquet-controls button {
+  min-height: 2.55rem;
+  padding: .55rem .9rem;
+  color: #24332c;
+  background: #f7f0d7;
+  border: 1px solid #6c744f;
+  border-radius: 8px;
+  box-shadow: 0 2px 7px rgba(48, 49, 28, .13);
+}
+.toolbar button:hover, .flower-button:hover, .bouquet-controls button:hover { background: #e7e0bb; }
+
+.flower-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: .75rem;
+  padding: 1rem;
+  pointer-events: none;
+}
+.flower-button { text-align: left; pointer-events: auto; }
+.flower-button[aria-pressed='true'] { color: #fffdf3; background: #596344; }
+.bouquet-controls { display: flex; flex-wrap: wrap; gap: .7rem; padding: 1rem; pointer-events: none; }
+.bouquet-controls button { pointer-events: auto; }
+
+.notice {
+  position: fixed;
+  z-index: 30;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  max-width: min(32rem, calc(100vw - 2.5rem));
+  padding: .75rem 1rem;
+  color: #fffdf4;
+  background: #3d534f;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(35, 38, 28, .28);
+}
+
+/* Dialogue: portrait carries scene; panel stays an unobtrusive counter edge. */
+.dialogue-panel {
+  position: absolute;
+  z-index: 20;
+  right: clamp(.75rem, 3vw, 2.5rem);
+  bottom: clamp(.75rem, 3vw, 2rem);
+  left: clamp(.75rem, 3vw, 2.5rem);
+  max-width: 76rem;
+  margin: 0 auto;
+  color: #283023;
+  background: #fffaf0;
+  border: 1px solid #858460;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(38, 35, 25, .27);
+}
+.dialogue-body { display: grid; grid-template-columns: minmax(9rem, 19rem) minmax(0, 1fr); min-height: 13rem; }
+.dialogue-portrait-wrapper {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  min-height: 13rem;
+  padding: .6rem .4rem 0;
+  background: #e7dfc7;
+  border-radius: 11px 0 0 11px;
+  overflow: hidden;
+}
+.dialogue-portrait { display: block; width: 100%; max-height: 22rem; object-fit: contain; object-position: center bottom; }
+.dialogue-main-column { display: flex; flex-direction: column; min-width: 0; padding: clamp(1rem, 2.5vw, 1.6rem); }
+.dialogue-header { margin-bottom: .25rem; }
+.dialogue-speaker { margin: 0; color: #3c513a; font-size: clamp(1.15rem, 1.7vw, 1.45rem); letter-spacing: -.02em; }
+.dialogue-text { max-width: 70ch; min-height: 4.5em; color: #24271e; font-size: clamp(1rem, 1.25vw, 1.15rem); line-height: 1.7; white-space: pre-wrap; }
+.dialogue-actions { margin-top: auto; padding-top: 1rem; }
+.dialogue-choices { display: grid; gap: .55rem; }
+.dialogue-choice-button, .dialogue-continue-button {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .6rem .8rem;
+  color: #253229;
+  text-align: left;
+  background: #f2ead2;
+  border: 1px solid #78805d;
+  border-radius: 7px;
+}
+.dialogue-choice-button:hover, .dialogue-continue-button:hover { background: #e2dbba; }
+.dialogue-choice-index { display: inline-grid; flex: 0 0 1.55rem; place-items: center; width: 1.55rem; height: 1.55rem; color: #fffdf4; background: #536044; border-radius: 50%; font-size: .8rem; }
+.dialogue-continue-button { width: auto; min-width: 9rem; justify-content: center; margin-left: auto; background: #dfe6c5; }
+
+/* Modal surfaces are single paper sheets, not stacked cards. */
+.journal-overlay, .settings-overlay {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(.75rem, 3vw, 2rem);
+  background: rgba(34, 37, 30, .58);
+}
+.journal-panel, .settings-panel {
+  width: min(100%, 68rem);
+  max-height: min(49rem, calc(100vh - 1.5rem));
+  overflow: hidden;
+  color: #293024;
+  background: #fff9e9;
+  border: 1px solid #797b5c;
+  border-radius: 12px;
+  box-shadow: 0 18px 45px rgba(25, 26, 18, .36);
+}
+.journal-panel { display: grid; grid-template-rows: auto auto minmax(0, 1fr); }
+.journal-header, .settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1rem, 2vw, 1.55rem) clamp(1rem, 3vw, 2.1rem) .7rem;
+}
+.journal-title, .settings-title { margin: 0; font-size: clamp(1.35rem, 2.4vw, 2rem); letter-spacing: -.03em; }
+.journal-close-button, .settings-close-button {
+  flex: 0 0 auto;
+  min-height: 2.45rem;
+  padding: .5rem .75rem;
+  color: #323a2d;
+  background: transparent;
+  border: 1px solid #677153;
+  border-radius: 7px;
+}
+.journal-close-button:hover, .settings-close-button:hover { background: #ebe2c8; }
+.journal-tabs { display: flex; gap: .35rem; padding: 0 clamp(1rem, 3vw, 2.1rem); border-bottom: 1px solid #c7bb94; }
+.journal-tab-button { padding: .75rem .95rem; color: #4a503d; background: transparent; border: 0; border-bottom: 3px solid transparent; }
+.journal-tab-button:hover { color: #283b31; }
+.journal-tab-button.is-active { color: #293e31; border-bottom-color: #566546; font-weight: 700; }
+.journal-content { min-height: 0; padding: clamp(1rem, 2.7vw, 2rem); overflow: auto; }
+.journal-entry-list { display: grid; gap: 1.15rem; max-width: 72ch; padding: 0; margin: 0; list-style: none; }
+.journal-entry-item { padding-bottom: 1.1rem; border-bottom: 1px solid #d2c6a5; }
+.journal-entry-title { margin: 0 0 .3rem; color: #3f513b; font-size: 1.18rem; }
+.journal-entry-text { margin: 0; line-height: 1.7; white-space: pre-wrap; }
+.journal-empty-state { max-width: 48ch; padding: 1.2rem 0; color: #59604b; font-style: italic; }
+.journal-flower-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.25rem; }
+.journal-flower-card { padding-bottom: 1.15rem; border-bottom: 1px solid #c4b98f; }
+.journal-flower-card-header { display: flex; align-items: baseline; justify-content: space-between; gap: .7rem; }
+.journal-flower-name { margin: 0; color: #3f513b; font-size: 1.15rem; }
+.journal-category-badge { flex: 0 0 auto; padding: .18rem .45rem; color: #fffdf4; background: #60704d; border-radius: 999px; font-size: .76rem; }
+.journal-category-badge.is-dead { background: #634f68; }
+.journal-category-badge.is-both { background: #465e65; }
+.journal-flower-description { margin: .65rem 0; line-height: 1.62; }
+.journal-flower-meta { display: grid; gap: .35rem; margin: 0; font-size: .9rem; }
+.journal-meta-row { display: grid; grid-template-columns: minmax(6.7rem, .85fr) 1.45fr; gap: .6rem; }
+.journal-meta-label { color: #596046; font-weight: 700; }
+.journal-meta-value { margin: 0; color: #34382b; }
+
+.settings-panel { width: min(100%, 38rem); overflow: auto; }
+.settings-form { padding: .4rem clamp(1rem, 3vw, 2.1rem) 1.35rem; }
+.settings-group { display: grid; gap: .55rem; padding: 1rem 0; border-bottom: 1px solid #d3c8aa; }
+.settings-group-header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.settings-label { color: #323d2f; font-weight: 700; }
+.settings-select { width: min(100%, 25rem); min-height: 2.55rem; padding: .42rem .55rem; color: #293126; background: #fffdf4; border: 1px solid #77805d; border-radius: 6px; }
+.settings-value-badge { color: #40533d; font-variant-numeric: tabular-nums; font-weight: 700; }
+.settings-slider { width: 100%; accent-color: #60704a; }
+.settings-checkbox-group { border-bottom: 0; }
+.settings-checkbox-label { display: flex; align-items: flex-start; gap: .7rem; color: #323d2f; line-height: 1.45; }
+.settings-checkbox { flex: 0 0 auto; width: 1.15rem; height: 1.15rem; margin: .15rem 0 0; accent-color: #566747; }
+.settings-footer { display: flex; justify-content: end; padding: .9rem clamp(1rem, 3vw, 2.1rem) 1.3rem; border-top: 1px solid #d3c8aa; }
+.settings-done-button { min-height: 2.65rem; padding: .55rem 1rem; color: #fffdf4; background: #4f6346; border: 1px solid #3a4a35; border-radius: 7px; }
+.settings-done-button:hover { background: #40563d; }
+
+.dead-shift { background: transparent; color: #f2ead9; }
+.dead-shift .game-header { background: rgba(36, 32, 45, .95); }
+.dead-shift .toolbar { color: #f0e9dc; background: rgba(49, 48, 64, .96); border-color: #82758d; }
+.dead-shift .toolbar button, .dead-shift .flower-button, .dead-shift .bouquet-controls button { color: #f8f0e8; background: #4a465b; border-color: #9c8da4; }
+.dead-shift .toolbar button:hover, .dead-shift .flower-button:hover, .dead-shift .bouquet-controls button:hover { background: #5c536b; }
+.dead-shift .dialogue-panel { color: #f4eddf; background: #343345; border-color: #978ba0; }
+.dead-shift .dialogue-portrait-wrapper { background: #292d3b; }
+.dead-shift .dialogue-speaker { color: #dae5b7; }
+.dead-shift .dialogue-text { color: #fff8ec; }
+.dead-shift .dialogue-choice-button, .dead-shift .dialogue-continue-button { color: #fff7ea; background: #4b4b60; border-color: #a093aa; }
+.dead-shift .dialogue-choice-button:hover, .dead-shift .dialogue-continue-button:hover { background: #5c566e; }
+.dead-shift .dialogue-choice-index { background: #798d6a; }
+
+@media (max-width: 640px) {
+  .game-header { align-items: flex-start; flex-direction: column; gap: .2rem; }
+  .dialogue-panel { right: .5rem; bottom: .5rem; left: .5rem; }
+  .dialogue-body { grid-template-columns: minmax(5.7rem, 30vw) minmax(0, 1fr); min-height: 0; }
+  .dialogue-portrait-wrapper { min-height: 12rem; padding-top: .35rem; }
+  .dialogue-main-column { padding: .85rem; }
+  .dialogue-text { min-height: 5.1em; line-height: 1.55; }
+  .journal-overlay, .settings-overlay { padding: .5rem; }
+  .journal-panel, .settings-panel { max-height: calc(100vh - 1rem); border-radius: 9px; }
+  .journal-header, .settings-header { align-items: flex-start; padding: 1rem 1rem .65rem; }
+  .journal-tabs { padding: 0 1rem; }
+  .journal-content { padding: 1rem; }
+  .journal-flower-list { grid-template-columns: 1fr; }
+  .journal-meta-row { grid-template-columns: 1fr; gap: .1rem; }
+  .settings-form { padding: .3rem 1rem 1rem; }
+  .settings-footer { padding: .8rem 1rem 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
