@@ -3,14 +3,15 @@ import { createInitialGameState } from '../../src/game/state/GameState';
 import { reduceGameState } from '../../src/game/state/stateReducer';
 
 describe('state reducer', () => {
-  it('creates initial living state with six stocked flowers', () => {
+  it('creates initial living state with one stocked flower species', () => {
     const state = createInitialGameState();
-    expect(state.schemaVersion).toBe(1);
+    expect(state.schemaVersion).toBe(2);
     expect(state.currentChapter).toBe('thang-mot');
     expect(state.currentDay).toBe('day-1');
     expect(state.currentShift).toBe('living');
-    expect(state.unlockedFlowerIds).toHaveLength(6);
-    expect(Object.values(state.inventory)).toEqual([12, 12, 12, 12, 12, 12]);
+    expect(state.unlockedFlowerIds).toEqual(['hoa-cuc-trang']);
+    expect(state.inventory['hoa-cuc-trang']).toBe(30);
+    expect(state.npcProgress['bac-ba']?.affinity).toBe(50);
   });
 
   it('completes order immutably and charges each bouquet flower once', () => {
@@ -21,9 +22,9 @@ describe('state reducer', () => {
       bouquetFlowerIds: ['hoa-cuc-trang', 'hoa-cuc-trang'],
       effects: [],
     });
-    expect(state.inventory['hoa-cuc-trang']).toBe(10);
+    expect(state.inventory['hoa-cuc-trang']).toBe(28);
     expect(state.completedOrderIds).toContain('order-01-bac-ba');
-    expect(initial.inventory['hoa-cuc-trang']).toBe(12);
+    expect(initial.inventory['hoa-cuc-trang']).toBe(30);
     expect(initial.completedOrderIds).not.toContain('order-01-bac-ba');
   });
 
@@ -37,7 +38,7 @@ describe('state reducer', () => {
     };
     const once = reduceGameState(initial, event);
     const twice = reduceGameState(once, event);
-    expect(twice.inventory['hoa-cuc-trang']).toBe(11);
+    expect(twice.inventory['hoa-cuc-trang']).toBe(29);
     expect(twice.completedOrderIds.filter((id) => id === 'order-01-bac-ba')).toHaveLength(1);
   });
 
@@ -45,7 +46,7 @@ describe('state reducer', () => {
     const initial = createInitialGameState();
     expect(() => reduceGameState(initial, {
       type: 'completeOrder', orderId: 'order-01-bac-ba',
-      bouquetFlowerIds: Array.from({ length: 13 }, () => 'hoa-cuc-trang'), effects: [],
+      bouquetFlowerIds: Array.from({ length: 31 }, () => 'hoa-cuc-trang'), effects: [],
     })).toThrow(/inventory|stock|available/i);
     const invalid = { ...initial, inventory: { ...initial.inventory, 'hoa-cuc-trang': -1 } };
     expect(() => reduceGameState(invalid, { type: 'effect', effect: { type: 'setFlag', flag: 'flag_read_aunt_spirit_journal', value: true } })).toThrow(/negative/i);
@@ -67,7 +68,8 @@ describe('state reducer', () => {
     const related = reduceGameState(flagged, {
       type: 'effect', effect: { type: 'relationship', customerId: 'bac-ba', amount: 2 },
     });
-    expect(related.relationshipScores['bac-ba']).toBe(2);
+    expect(related.relationshipScores['bac-ba']).toBe(52);
+    expect(related.npcProgress['bac-ba']?.affinity).toBe(52);
     const journaled = reduceGameState(related, {
       type: 'effect', effect: { type: 'journal', entryId: 'journal_aunt_hoang_tuyen' },
     });
@@ -89,15 +91,15 @@ describe('state reducer', () => {
     expect(finished.activeDialogueId).toBeUndefined();
   });
 
-  it('restocks depleted unlocked flowers to minimum 12 on advanceShift without reducing higher stock', () => {
+  it('restocks depleted unlocked flowers to minimum 30 on advanceShift without reducing higher stock', () => {
     const initial = createInitialGameState();
     const withCustomInventory = {
       ...initial,
+      unlockedFlowerIds: ['hoa-cuc-trang', 'hoa-hong-do', 'hoa-huong-duong'],
       inventory: {
-        ...initial.inventory,
         'hoa-hong-do': 0,
         'hoa-cuc-trang': 3,
-        'hoa-huong-duong': 15,
+        'hoa-huong-duong': 35,
       },
     };
     const shifted = reduceGameState(withCustomInventory, {
@@ -105,8 +107,8 @@ describe('state reducer', () => {
       shift: 'dead',
     });
     expect(shifted.currentShift).toBe('dead');
-    expect(shifted.inventory['hoa-hong-do']).toBe(12);
-    expect(shifted.inventory['hoa-cuc-trang']).toBe(12);
-    expect(shifted.inventory['hoa-huong-duong']).toBe(15);
+    expect(shifted.inventory['hoa-hong-do']).toBe(30);
+    expect(shifted.inventory['hoa-cuc-trang']).toBe(30);
+    expect(shifted.inventory['hoa-huong-duong']).toBe(35);
   });
 });

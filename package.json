@@ -4,19 +4,33 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
-    "build": "tsc --noEmit && npm run validate:content && vite build",
+    "dev": "next dev -p 5173 -H 127.0.0.1",
+    "build": "tsc --noEmit && npm run validate:content && next build",
     "test": "vitest run",
-    "validate:content": "tsx src/game/content/validateContentCli.ts"
+    "validate:content": "tsx src/game/content/validateContentCli.ts",
+    "mcp": "tsx tools/mcp/stdio.ts",
+    "mcp:smoke": "tsx tools/mcp/smoke.ts"
   },
   "dependencies": {
-    "phaser": "3.90.0"
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "howler": "^2.2.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "0.186.1"
   },
   "devDependencies": {
+    "@modelcontextprotocol/client": "2.4.0",
+    "@modelcontextprotocol/server": "2.4.0",
+    "@types/howler": "^2.2.13",
     "@types/node": "22.13.10",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@types/three": "0.186.0",
+    "next": "^16.4.3",
     "tsx": "4.19.3",
     "typescript": "5.7.2",
-    "vite": "6.3.1",
-    "vitest": "3.0.8"
+    "vitest": "3.0.8",
+    "zod": "4.3.6"
   }
 }

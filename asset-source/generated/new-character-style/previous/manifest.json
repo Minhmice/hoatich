@@ -1,0 +1,62 @@
+[
+  {
+    "path": "asset-source/characters/bac-ba/01.png",
+    "backup": "asset-source/generated/new-character-style/previous/bac-ba-01.png",
+    "sha256": "50d732ca64bf88d922cf5a9d09d79e74b4085b137beb81ba0ac03bb8632115c0"
+  },
+  {
+    "path": "public/assets/characters/bac-ba/01.webp",
+    "backup": "asset-source/generated/new-character-style/previous/bac-ba-01.webp",
+    "sha256": "58ffe651debd75e127165238521401fd36e32ade3b5a54a45cce88034ebaab75"
+  },
+  {
+    "path": "asset-source/characters/bac-ba/02.png",
+    "backup": "asset-source/generated/new-character-style/previous/bac-ba-02.png",
+    "sha256": "6bb3eb601f5df5e75dae50387d4e2c4acdb2bd1d7c7298ceddb44aa8f0151977"
+  },
+  {
+    "path": "public/assets/characters/bac-ba/02.webp",
+    "backup": "asset-source/generated/new-character-style/previous/bac-ba-02.webp",
+    "sha256": "e2efdcb1e254e364c4510d29bb51a6eceb80b859d2af4e943f063462fecb02f8"
+  },
+  {
+    "path": "asset-source/characters/bac-ba/03.png",
+    "backup": "asset-source/generated/new-character-style/previous/bac-ba-03.png",
+    "sha256": "e81b7071bc1cbdd2531992b9483fc222b9069c8e0a84467a8272b4cd7c76356f"
+  },
+  {
+    "path": "public/assets/characters/bac-ba/03.webp",
+    "backup": "asset-source/generated/new-character-style/previous/bac-ba-03.webp",
+    "sha256": "9dbe59edd421fa773e44a3d996e88e8f87a4fab04ee524844f2eda724eadd269"
+  },
+  {
+    "path": "asset-source/characters/spirit-poet/01.png",
+    "backup": "asset-source/generated/new-character-style/previous/spirit-poet-01.png",
+    "sha256": "e223668d3c0954c2b03fe8fe817b2fdf9f273c0b172cbea9945d426cd8f00b3d"
+  },
+  {
+    "path": "public/assets/characters/spirit-poet/01.webp",
+    "backup": "asset-source/generated/new-character-style/previous/spirit-poet-01.webp",
+    "sha256": "fe693ccf4bce661b36d5fdcfdd9e4b10faec2d54a391ae105b74d6d6ae2e8158"
+  },
+  {
+    "path": "asset-source/characters/spirit-poet/02.png",
+    "backup": "asset-source/generated/new-character-style/previous/spirit-poet-02.png",
+    "sha256": "ef25fe4874f5a4d0476a84d36b4750d3afc1bd7a040ad35da74090f3e1d14a01"
+  },
+  {
+    "path": "public/assets/characters/spirit-poet/02.webp",
+    "backup": "asset-source/generated/new-character-style/previous/spirit-poet-02.webp",
+    "sha256": "304bf40abe3bcb8f359cc5f51e2fc927d178ed938cf017ea2554674eccec7a02"
+  },
+  {
+    "path": "asset-source/characters/spirit-poet/03.png",
+    "backup": "asset-source/generated/new-character-style/previous/spirit-poet-03.png",
+    "sha256": "e98687d626f3cc03700cf394c6764b9c7d1199f594a081923e7ac20f1831e2d8"
+  },
+  {
+    "path": "public/assets/characters/spirit-poet/03.webp",
+    "backup": "asset-source/generated/new-character-style/previous/spirit-poet-03.webp",
+    "sha256": "e5679176cef5440b26aee7722c3746f9fa7e45d7c7364ceab81e1db8d917b23a"
+  }
+]

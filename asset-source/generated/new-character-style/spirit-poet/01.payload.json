@@ -1,0 +1,12 @@
+{
+  "model": "cx/gpt-image-2.5",
+  "prompt": "Use the attached hand-drawn sprite ONLY as a DRAWING STYLE reference, NOT as a person/identity/wardrobe reference. Draw a completely different person described below. Same coarse dry charcoal/graphite pencil contours with visible imperfect grain, simple anime/storybook facial abstraction, tiny dash nose and small mouth, opaque muted flat matte color fills, sparse broad flat shadows, very few fold lines. No realistic pores, individual hair fibers, glossy rendering, elaborate watercolor, airbrushed portrait, detailed wrinkles, 3D, cinematic light. One isolated character from crown to upper thighs, square transparent canvas, arms resting naturally below chest, generous margins. Do not copy reference young man, navy sweater, school shirt, face or haircut; do not draw the player girl, blue bob, flower hairpin or florist apron. No sheet, no text, no scenery. NEW CHARACTER IDENTITY: A Vietnamese male poet spirit around30, slender elegant build, long narrow softly angular face, short black side-parted hair swept back, round thin dark wireframe spectacles over simplified gray-blue eyes. Wears a plain dark slate-blue traditional Vietnamese standing-collar long tunic (ao dai ngu than) with simple narrow front closure, no embroidery, no modern necktie, no sweater. Three-quarter standing portrait, hands lowered. Restrained wistful neutral expression. Clearly distinct from the young reference customer. Convey ghostliness by a restrained pale cool face and desaturated bluish clothing with a few very faint pale-blue strokes close to silhouette, NOT heavy smoke, glowing background or horror, NO full-canvas translucent overlay. Crisp visible character on true transparent background.",
+  "size": "1024x1024",
+  "background": "transparent",
+  "image": {
+    "path": "asset-source/characters/customer-one/01.png",
+    "sha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd",
+    "encoding": "data:image/png;base64"
+  },
+  "mood": "neutral"
+}

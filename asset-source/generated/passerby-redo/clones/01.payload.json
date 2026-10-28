@@ -1,0 +1,12 @@
+{
+  "model": "cx/gpt-image-2.5",
+  "prompt": "Edit the supplied ORIGINAL game sprite, do not redesign or redraw a different character. Keep the exact same illustration, proportions, composition, pose, clothes, hands on hips, hair outline, jade bead necklace and jade wrist bangle, and coarse pencil linework. Maintain stern skeptical expression: downward-angled furrowed dark eyebrows, skeptical squinting dark eyes, tightly closed straight downturned mouth, suspicious judgmental stare, head facing straight forward without tilt. Match original's rough charcoal pencil outlines and opaque flat matte colors; do not polish, add texture, hair strands, realistic skin, or watercolor shading. Keep original square transparent framing.",
+  "size": "1024x1024",
+  "background": "transparent",
+  "image": {
+    "path": "asset-source/characters/passerby/01.png",
+    "sha256": "6c977bc3e960fcae633865867f3cff0dfdc0bd1985460accd721e04c58b9f540",
+    "encoding": "data:image/png;base64"
+  },
+  "mood": "skeptical"
+}

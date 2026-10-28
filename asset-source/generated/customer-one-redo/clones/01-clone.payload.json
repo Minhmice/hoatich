@@ -1,0 +1,11 @@
+{
+  "model": "cx/gpt-image-2.5",
+  "prompt": "Reproduce the supplied ORIGINAL sprite exactly as an AI reproduction control. Keep the exact same character identity, clothing, hair, proportions, waist-up framing, and hand-drawn sketchy graphite pencil art style. Young man in late teens/early 20s with short parted charcoal hair, clear green eyes, crisp white short-sleeved collared shirt, and dark navy blue knit sweater tied around neck with sleeves knotted in front across chest. Neutral calm expression, small closed straight-line mouth, composed green eyes, relaxed dark pencil brows. Arms resting naturally at sides. Isolated sprite on pure transparent background. ONE sprite, no sheet, no text.",
+  "size": "1024x1024",
+  "background": "transparent",
+  "image": {
+    "path": "asset-source/characters/customer-one/01.png",
+    "sha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd",
+    "encoding": "data:image/png;base64"
+  }
+}

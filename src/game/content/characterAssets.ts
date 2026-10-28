@@ -4,10 +4,10 @@ export interface CharacterVariant {
   readonly index: string;
   readonly url: string;
   readonly mood: string;
-  readonly originalDir: string;
-  readonly originalName: string;
+  readonly originalDir?: string;
+  readonly originalName?: string;
   /** SHA-256 hash of original source file in DEMO_assets */
-  readonly sha256: string;
+  readonly sha256?: string;
 }
 
 export interface CharacterAssetEntry {
@@ -25,6 +25,10 @@ export const characterAssets: Record<CharacterId, CharacterAssetEntry> = {
       '/assets/characters/player/01.webp',
       '/assets/characters/player/02.webp',
       '/assets/characters/player/03.webp',
+      '/assets/characters/player/04.webp',
+      '/assets/characters/player/05.webp',
+      '/assets/characters/player/06.webp',
+      '/assets/characters/player/07.webp',
     ],
     variants: [
       {
@@ -51,6 +55,26 @@ export const characterAssets: Record<CharacterId, CharacterAssetEntry> = {
         originalName: 'Main_F_03 demo.png',
         sha256: '3870745533ef4e1e1addbb958866527358ecc700bd6d70945e294aa7af1562e7',
       },
+      {
+        index: '04',
+        url: '/assets/characters/player/04.webp',
+        mood: 'sad',
+      },
+      {
+        index: '05',
+        url: '/assets/characters/player/05.webp',
+        mood: 'angry',
+      },
+      {
+        index: '06',
+        url: '/assets/characters/player/06.webp',
+        mood: 'surprised',
+      },
+      {
+        index: '07',
+        url: '/assets/characters/player/07.webp',
+        mood: 'thinking',
+      },
     ],
   },
   passerby: {
@@ -59,6 +83,9 @@ export const characterAssets: Record<CharacterId, CharacterAssetEntry> = {
     urls: [
       '/assets/characters/passerby/01.webp',
       '/assets/characters/passerby/02.webp',
+      '/assets/characters/passerby/03.webp',
+      '/assets/characters/passerby/04.webp',
+      '/assets/characters/passerby/05.webp',
     ],
     variants: [
       {
@@ -77,6 +104,21 @@ export const characterAssets: Record<CharacterId, CharacterAssetEntry> = {
         originalName: "KVL1.2 .png",
         sha256: '9a5b9dfa7f8219d38ac5c8e1a74d5022c2739c0fd8b0a1394da53ed9f1b022fc',
       },
+      {
+        index: '03',
+        url: '/assets/characters/passerby/03.webp',
+        mood: 'happy',
+      },
+      {
+        index: '04',
+        url: '/assets/characters/passerby/04.webp',
+        mood: 'angry',
+      },
+      {
+        index: '05',
+        url: '/assets/characters/passerby/05.webp',
+        mood: 'surprised',
+      },
     ],
   },
   'customer-one': {
@@ -85,6 +127,9 @@ export const characterAssets: Record<CharacterId, CharacterAssetEntry> = {
     urls: [
       '/assets/characters/customer-one/01.webp',
       '/assets/characters/customer-one/02.webp',
+      '/assets/characters/customer-one/03.webp',
+      '/assets/characters/customer-one/04.webp',
+      '/assets/characters/customer-one/05.webp',
     ],
     variants: [
       {
@@ -102,6 +147,21 @@ export const characterAssets: Record<CharacterId, CharacterAssetEntry> = {
         originalDir: "DEMO_assets/Khách 1",
         originalName: 'CT1_02 demo.png',
         sha256: '73b777b068402cfa5788374e128b294d391665a137af91a103d971a3bf17e864',
+      },
+      {
+        index: '03',
+        url: '/assets/characters/customer-one/03.webp',
+        mood: 'sad',
+      },
+      {
+        index: '04',
+        url: '/assets/characters/customer-one/04.webp',
+        mood: 'touched',
+      },
+      {
+        index: '05',
+        url: '/assets/characters/customer-one/05.webp',
+        mood: 'surprised',
       },
     ],
   },

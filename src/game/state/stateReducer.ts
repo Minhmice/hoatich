@@ -3,7 +3,7 @@ import type { Effect, Shift } from '../content/types';
 import type { GameSettings, GameState } from './GameState';
 
 export type GameEvent =
-  | { type: 'completeOrder'; orderId: string; bouquetFlowerIds: string[]; effects: Effect[] }
+  | { type: 'completeOrder'; orderId: string; bouquetFlowerIds: string[]; effects: Effect[]; outcome?: 'missed' | 'accepted' | 'resonant' }
   | { type: 'effect'; effect: Effect }
   | { type: 'advanceShift'; shift: Shift; dayId?: string }
   | { type: 'settings'; settings: Partial<GameSettings> }
@@ -32,6 +32,12 @@ function assertState(state: GameState): void {
   for (const orderId of state.completedOrderIds) if (!orders[orderId]) throw new Error(`Unknown completed order ID: ${orderId}`);
   for (const customerId of Object.keys(state.relationshipScores)) if (!customers[customerId]) throw new Error(`Unknown relationship customer ID: ${customerId}`);
   for (const [customerId, score] of Object.entries(state.relationshipScores)) if (!Number.isFinite(score)) throw new Error(`Relationship score must be finite: ${customerId}`);
+  for (const [customerId, progress] of Object.entries(state.npcProgress)) {
+    if (!customers[customerId]) throw new Error(`Unknown NPC progress customer ID: ${customerId}`);
+    if (!Number.isFinite(progress.affinity) || progress.affinity < 0 || progress.affinity > 100) throw new Error(`NPC affinity out of range: ${customerId}`);
+    if (!Number.isInteger(progress.completedDeliveries) || progress.completedDeliveries < 0) throw new Error(`NPC completed delivery count invalid: ${customerId}`);
+    if (!['neutral', 'good', 'strained'].includes(progress.activeBranch) || (progress.queuedBranch !== null && !['neutral', 'good', 'strained'].includes(progress.queuedBranch))) throw new Error(`NPC branch invalid: ${customerId}`);
+  }
   for (const flag of Object.keys(state.flags)) if (!flags[flag]) throw new Error(`Unknown flag ID: ${flag}`);
   for (const entryId of state.journalEntryIds) if (!journals[entryId]) throw new Error(`Unknown journal entry ID: ${entryId}`);
   if (state.currentOrderId !== undefined && !orders[state.currentOrderId]) throw new Error(`Unknown order ID: ${state.currentOrderId}`);
@@ -52,6 +58,7 @@ export function applyEffects(state: GameState, effects: Effect[]): GameState {
   let next: GameState = {
     ...state,
     inventory: { ...state.inventory },
+    npcProgress: Object.fromEntries(Object.entries(state.npcProgress).map(([id, progress]) => [id, { ...progress }])),
     unlockedFlowerIds: [...state.unlockedFlowerIds],
     relationshipScores: { ...state.relationshipScores },
     flags: { ...state.flags },
@@ -64,9 +71,15 @@ export function applyEffects(state: GameState, effects: Effect[]): GameState {
       case 'setFlag':
         next.flags[effect.flag] = effect.value;
         break;
-      case 'relationship':
-        next.relationshipScores[effect.customerId] = (next.relationshipScores[effect.customerId] ?? 0) + effect.amount;
+      case 'relationship': {
+        const current = next.npcProgress[effect.customerId]?.affinity ?? next.relationshipScores[effect.customerId] ?? 50;
+        const updated = Math.max(0, Math.min(100, current + effect.amount));
+        next.relationshipScores[effect.customerId] = updated;
+        if (next.npcProgress[effect.customerId]) {
+          next.npcProgress[effect.customerId].affinity = updated;
+        }
         break;
+      }
       case 'unlockFlower':
         if (!next.unlockedFlowerIds.includes(effect.flowerId)) {
           next.unlockedFlowerIds.push(effect.flowerId);
@@ -107,6 +120,19 @@ export function reduceGameState(state: GameState, event: GameEvent): GameState {
       inventory[flowerId] = available - count;
     }
     const next = applyEffects({ ...state, inventory }, event.effects);
+    const order = contentBundle.orders.find((entry) => entry.id === event.orderId)!;
+    const progress = next.npcProgress[order.customerId];
+    const hasRelationshipEffect = event.effects.some((e) => e.type === 'relationship' && e.customerId === order.customerId);
+    const delta = event.outcome === 'resonant' ? 15 : event.outcome === 'accepted' ? 8 : -12;
+    const affinity = hasRelationshipEffect
+      ? progress.affinity
+      : Math.max(0, Math.min(100, progress.affinity + delta));
+    const completedDeliveries = progress.completedDeliveries + 1;
+    const queuedBranch = progress.queuedBranch ?? (completedDeliveries >= 3 && affinity >= 70
+      ? 'good'
+      : completedDeliveries >= 3 && affinity <= 30 ? 'strained' : null);
+    next.npcProgress[order.customerId] = { ...progress, affinity, completedDeliveries, queuedBranch };
+    next.relationshipScores[order.customerId] = affinity;
     return { ...next, completedOrderIds: [...state.completedOrderIds, event.orderId], currentOrderId: undefined, activeDialogueId: undefined };
   }
   if (event.type === 'effect') return applyEffects(state, [event.effect]);
@@ -114,15 +140,28 @@ export function reduceGameState(state: GameState, event: GameEvent): GameState {
     if (event.shift !== 'living' && event.shift !== 'dead') throw new Error(`Unknown shift: ${event.shift}`);
     if (event.dayId !== undefined && !dayIds[event.dayId]) throw new Error(`Unknown day ID: ${event.dayId}`);
     const inventory = { ...state.inventory };
-    for (const flowerId of state.unlockedFlowerIds) {
-      const current = inventory[flowerId] ?? 0;
-      if (current < 12) {
-        inventory[flowerId] = 12;
-      }
-    }
+    for (const flowerId of state.unlockedFlowerIds) inventory[flowerId] = Math.max(inventory[flowerId] ?? 0, 30);
+    const unlockForDay: Record<string, string> = {
+      'day-1': 'hoa-cuc-trang',
+      'day-2': 'hoa-hong-do',
+      'day-3': 'hoa-huong-duong',
+      'day-4': 'hoa-sen-hong',
+      'day-5': 'hoa-thuy-tien',
+      'day-6': 'hoa-luu-ly',
+    };
+    const newlyUnlocked = event.dayId ? unlockForDay[event.dayId] : undefined;
+    const unlockedFlowerIds = newlyUnlocked ? [...new Set([...state.unlockedFlowerIds, newlyUnlocked])] : state.unlockedFlowerIds;
+    if (newlyUnlocked) inventory[newlyUnlocked] = 30;
+    const npcProgress = event.dayId && event.shift === 'living'
+      ? Object.fromEntries(Object.entries(state.npcProgress).map(([id, progress]) => [id, progress.queuedBranch
+        ? { ...progress, activeBranch: progress.queuedBranch, queuedBranch: null }
+        : progress]))
+      : state.npcProgress;
     return {
       ...state,
       inventory,
+      unlockedFlowerIds,
+      npcProgress,
       currentShift: event.shift,
       ...(event.dayId === undefined ? {} : { currentDay: event.dayId }),
     };

@@ -1,0 +1,11 @@
+{
+  "model": "cx/gpt-image-2.5",
+  "prompt": "Edit the supplied ORIGINAL game sprite, do not redesign or redraw a different character. Keep the exact same illustration, proportions, composition, pose, clothes, hand, spray bottle, hair outline, headband, flower pin and coarse pencil linework. Change ONLY facial expression within eyebrows, eyelids and small mouth: mildly annoyed, eyebrows angled down slightly toward the center, eyes remain fully recognizable and amber, a tiny tight closed mouth, no teeth, no anger symbol. Keep eyes amber and open, no tears, no head tilt. Preserve slate-indigo hair, black headband, white daisy on viewer-left, cream collared shirt, olive deep-V vest with cream stripe, charcoal waist-only apron, blue spray bottle. Match original's simple large eye shapes, sparse rough charcoal pencil outlines and opaque flat matte colors; do not polish, add texture/detail, hair strands, realistic skin, gradients or watercolor shading. Keep original square transparent framing with entire original silhouette and visible bottle, same crop and empty space. ONE sprite, no sheet, no text.",
+  "size": "1024x1024",
+  "background": "transparent",
+  "image": {
+    "path": "asset-source/characters/player/02.png",
+    "sha256": "1417796fb4dd9a8ea4356380880cada320582e5f457e5ae80bd3e8256064a8d9",
+    "encoding": "data:image/png;base64"
+  }
+}

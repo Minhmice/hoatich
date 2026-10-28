@@ -1,10 +1,11 @@
 import { contentBundle } from '../content';
-import type { Effect, FlowerDefinition, OrderDefinition, Outcome, Requirement } from '../content/types';
+import { getCardChoices, getFeatures, getOrderArrangement } from '../content/progression';
+import type { BouquetSubmission, Effect, FlowerDefinition, OrderDefinition, Outcome, Requirement, RequiredFinish } from '../content/types';
 import { BouquetModel, type BouquetItem } from './BouquetModel';
 
 export { BouquetModel, type BouquetItem };
 
-function flowerMatchesTaboo(flower: FlowerDefinition, taboo: Requirement): boolean {
+export function flowerMatchesTaboo(flower: FlowerDefinition, taboo: Requirement): boolean {
   switch (taboo.kind) {
     case 'flower':
       return flower.id === taboo.value;
@@ -24,7 +25,7 @@ function flowerMatchesTaboo(flower: FlowerDefinition, taboo: Requirement): boole
   }
 }
 
-function flowerMatchesRequirement(flower: FlowerDefinition, requirement: Requirement): boolean {
+export function flowerMatchesRequirement(flower: FlowerDefinition, requirement: Requirement): boolean {
   switch (requirement.kind) {
     case 'flower':
       return flower.id === requirement.value;
@@ -51,84 +52,111 @@ function flowerMatchesRequirement(flower: FlowerDefinition, requirement: Require
   }
 }
 
-export function evaluateBouquet(
-  order: OrderDefinition,
-  bouquet: BouquetModel | readonly BouquetItem[],
-  context: { flags: Record<string, boolean | number | string> },
-): {
+
+export interface BouquetEvaluation {
   outcome: Outcome;
   reasonIds: string[];
   effects: Effect[];
   matchedRuleIds: string[];
-} {
-  const items: readonly BouquetItem[] = bouquet instanceof BouquetModel ? bouquet.items : bouquet;
+  metadataChecked: boolean;
+}
 
+function submissionOf(bouquet: BouquetModel | BouquetSubmission | readonly BouquetItem[]): BouquetSubmission | undefined {
+  if (bouquet instanceof BouquetModel) return undefined;
+  if (Array.isArray(bouquet)) return undefined;
+  return bouquet as BouquetSubmission;
+}
+
+function finishReasons(required: RequiredFinish | undefined, submission: BouquetSubmission, order: OrderDefinition): string[] {
+  if (!required) return [];
+  const reasons: string[] = [];
+  const dayFeatures = getFeatures(order.dayId);
+  if (required.paper && dayFeatures.paper && submission.finish.paper !== required.paper) reasons.push(`finish:paper:${required.paper}`);
+  if (required.ribbon && dayFeatures.ribbon && (submission.finish.ribbon !== required.ribbon || submission.finish.bowStep !== 3)) reasons.push(`finish:ribbon:${required.ribbon}`);
+  if (required.requireCard && dayFeatures.cards && !submission.finish.cardId) reasons.push('finish:card:required');
+  if (required.targetTone && submission.finish.cardId) {
+    const card = getCardChoices(order.id).find((choice) => choice.id === submission.finish.cardId);
+    if (!card) reasons.push('finish:card:unknown');
+    else if (card.tone !== required.targetTone) reasons.push(`finish:card-tone:${required.targetTone}`);
+  }
+  return reasons;
+}
+
+export function evaluateBouquet(
+  order: OrderDefinition,
+  bouquet: BouquetModel | BouquetSubmission | readonly BouquetItem[],
+  context: { flags: Record<string, boolean | number | string> },
+): BouquetEvaluation {
+  const submission = submissionOf(bouquet);
+  const items: readonly BouquetItem[] = submission
+    ? submission.items
+    : bouquet instanceof BouquetModel ? bouquet.items : bouquet as readonly BouquetItem[];
   const flowers = items
     .map((item) => contentBundle.flowers.find((f) => f.id === item.flowerId))
     .filter((f): f is FlowerDefinition => f !== undefined);
 
-  const tabooReasons: string[] = [];
+  const reasons: string[] = [];
   for (const taboo of order.taboos) {
-    const count = flowers.filter((flower) => flowerMatchesTaboo(flower, taboo)).length;
-    const min = taboo.min ?? 1;
-    if (count >= min) {
-      tabooReasons.push(`taboo:${taboo.value}`, `taboo:${taboo.kind}:${taboo.value}`);
+    if (flowers.filter((flower) => flowerMatchesTaboo(flower, taboo)).length >= (taboo.min ?? 1)) {
+      reasons.push(`taboo:${taboo.value}`, `taboo:${taboo.kind}:${taboo.value}`);
     }
   }
-
-  const missingRequirementReasons: string[] = [];
   for (const requirement of order.explicitRequirements) {
-    const count = flowers.filter((flower) => flowerMatchesRequirement(flower, requirement)).length;
-    const min = requirement.min ?? 1;
-    if (count < min) {
-      missingRequirementReasons.push(
-        `missing:${requirement.value}`,
-        `missing:${requirement.kind}:${requirement.value}`,
-      );
+    if (flowers.filter((flower) => flowerMatchesRequirement(flower, requirement)).length < (requirement.min ?? 1)) {
+      reasons.push(`missing:${requirement.value}`, `missing:${requirement.kind}:${requirement.value}`);
     }
   }
 
-  if (tabooReasons.length > 0 || missingRequirementReasons.length > 0) {
-    const outcomeEffects = (order.effects?.missed ?? []).map((effect) => ({ ...effect }));
+  const metadataChecked = submission !== undefined;
+  const arrangementReasons: string[] = [];
+  if (submission) {
+    const arrangement = getOrderArrangement(order.id);
+    if (submission.configuration.vessel !== arrangement.suggestedVessel) {
+      arrangementReasons.push(`arrangement:vessel:${arrangement.suggestedVessel}`);
+    }
+    if (items.length < arrangement.minStems) {
+      arrangementReasons.push('arrangement:too-few-stems');
+    }
+    if (items.length > arrangement.maxStems) {
+      arrangementReasons.push('arrangement:too-many-stems');
+    }
+    reasons.push(...finishReasons(order.requiredFinish, submission, order));
+  }
+  if (reasons.length > 0) {
     return {
       outcome: 'missed',
-      reasonIds: [...tabooReasons, ...missingRequirementReasons],
-      effects: outcomeEffects,
+      reasonIds: [...reasons, ...arrangementReasons],
+      effects: (order.effects?.missed ?? []).map((effect) => ({ ...effect })),
       matchedRuleIds: [],
+      metadataChecked,
     };
   }
 
   const matchedRuleIds: string[] = [];
   const matchedRuleEffects: Effect[] = [];
-
   for (const rule of order.resonanceRules) {
-    const conditionsMet = rule.conditions.every(
-      (condition) => context.flags[condition.flag] === condition.equals,
-    );
-    if (!conditionsMet) continue;
-
-    const requirementsMet = rule.requirements.every((requirement) => {
-      const count = flowers.filter((flower) => flowerMatchesRequirement(flower, requirement)).length;
-      const min = requirement.min ?? 1;
-      return count >= min;
-    });
-    if (!requirementsMet) continue;
-
+    if (!rule.conditions.every((condition) => context.flags[condition.flag] === condition.equals)) continue;
+    if (!rule.requirements.every((requirement) => flowers.filter((flower) => flowerMatchesRequirement(flower, requirement)).length >= (requirement.min ?? 1))) continue;
     matchedRuleIds.push(rule.id);
     matchedRuleEffects.push(...rule.effects.map((effect) => ({ ...effect })));
   }
 
+  if (arrangementReasons.length > 0) {
+    return {
+      outcome: 'accepted',
+      reasonIds: ['accepted:suggestion-mismatch', ...arrangementReasons],
+      effects: (order.effects?.accepted ?? []).map((effect) => ({ ...effect })),
+      matchedRuleIds: [],
+      metadataChecked,
+    };
+  }
+
   const outcome: Outcome = matchedRuleIds.length > 0 ? 'resonant' : 'accepted';
-  const reasonIds: string[] =
-    outcome === 'resonant' ? [...matchedRuleIds] : ['accepted:explicit-requirements-met'];
-
-  const outcomeEffects = (order.effects?.[outcome] ?? []).map((effect) => ({ ...effect }));
-  const effects = [...outcomeEffects, ...matchedRuleEffects];
-
   return {
     outcome,
-    reasonIds,
-    effects,
+    reasonIds: outcome === 'resonant' ? [...matchedRuleIds] : ['accepted:explicit-requirements-met'],
+    effects: [...(order.effects?.[outcome] ?? []).map((effect) => ({ ...effect })), ...matchedRuleEffects],
     matchedRuleIds,
+    metadataChecked,
   };
 }

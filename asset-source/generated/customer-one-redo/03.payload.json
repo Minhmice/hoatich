@@ -1,0 +1,11 @@
+{
+  "model": "cx/gpt-image-2.5",
+  "prompt": "Edit the supplied ORIGINAL sprite, do not redesign or redraw a different character. Keep the exact same character identity, proportions, composition, waist-up framing, clothing, hair, and rough sketchy graphite pencil art style. Young man with short parted charcoal hair, green eyes, crisp white short-sleeved collared shirt, and dark navy blue knit sweater tied over shoulders with sleeves knotted in front across chest. Change ONLY facial expression within eyebrows, eyelids and mouth: quietly sad melancholic expression, downcast sorrowful green eyes looking slightly downward, inner brow ends subtly raised in quiet grief, small downturned closed mouth. Keep arms relaxed straight down at sides. Isolated sprite on pure transparent background. ONE sprite, no sheet, no text.",
+  "size": "1024x1024",
+  "background": "transparent",
+  "image": {
+    "path": "asset-source/characters/customer-one/01.png",
+    "sha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd",
+    "encoding": "data:image/png;base64"
+  }
+}

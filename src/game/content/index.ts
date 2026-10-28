@@ -4,6 +4,7 @@ export * from './customers';
 export * from './orders';
 export * from './dialogue';
 export * from './characterAssets';
+export * from './progression';
 
 import type { ContentBundle, JournalEntry } from './types';
 import { flowers } from './flowers';
@@ -28,9 +29,17 @@ export const runtimeFlags: string[] = [
   ...dialogues.filter((node) => node.effects?.length).map((node) => `dlg_effect_applied_${node.id}`),
 ];
 
-export const flags: string[] = [...narrativeFlags, ...runtimeFlags];
+export const detailFlags = orders.map((o) => `flag_heard_detail_${o.id}`);
+export const flags: string[] = [...new Set([...narrativeFlags, ...runtimeFlags, ...detailFlags])];
 export const chapterIds: Record<string, true> = { 'thang-mot': true };
-export const dayIds: Record<string, true> = { 'day-1': true, 'day-2': true };
+export const dayIds: Record<string, true> = {
+  'day-1': true,
+  'day-2': true,
+  'day-3': true,
+  'day-4': true,
+  'day-5': true,
+  'day-6': true,
+};
 
 export const journalEntries: JournalEntry[] = [
   {

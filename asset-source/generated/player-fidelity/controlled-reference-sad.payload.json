@@ -1,0 +1,11 @@
+{
+  "model": "cx/gpt-image-2.5",
+  "prompt": "One isolated 2D game dialogue character sprite, a young female florist, crown-to-upper-thigh crop on a square transparent canvas. Three-quarter torso turned slightly toward viewer-left, face toward viewer. Large rounded amber ochre eyes with simple dark pupils, pale warm cream skin, tiny short ink-mark nose and small simplified mouth. Short muted slate-indigo bob, curved chunky bangs, outward-flipped pointed locks at cheeks and nape, two small crown tufts. Broad black headband. One small white daisy with ochre center at viewer-left temple. Cream pointed-collar button shirt with loose sleeves rolled below elbows. Olive-green sleeveless deep V-neck vest with narrow cream V-shaped trim; charcoal-gray WAIST apron starts at waist, no bib and no shoulder straps. Thin black neck band. Forearm crosses waist holding a blue spray bottle angled down toward viewer-right, white trigger head pointing viewer-left. Opposite arm hangs at viewer-left. Preserve all clothing layers and accessories. Expression: quietly sad, inner eyebrows raised slightly, lowered upper eyelids, small downturned closed mouth; no tears. Drawing style: simple hand-drawn anime character design with rough broken charcoal-gray pencil contours and subtly grainy opaque flat matte color fills. Large simple color shapes, minimal hard-edged shadows under chin and in sleeve folds, sparse broad hair highlights. No realistic anatomy or portrait rendering, no glossy skin, no individual hair strands, no gradients, no watercolor washes, no intricate fabric or embroidery, no extra props, no scenery, no text, no sheet or multiple views. Keep generous blank space on viewer-left and character right of center.",
+  "size": "1024x1024",
+  "background": "transparent",
+  "image": {
+    "path": "asset-source/characters/player/02.png",
+    "sha256": "1417796fb4dd9a8ea4356380880cada320582e5f457e5ae80bd3e8256064a8d9",
+    "encoding": "data:image/png;base64"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "model": "cx/gpt-image-2.5",
+  "prompt": "Use the attached hand-drawn sprite ONLY as a DRAWING STYLE reference, NOT as a person/identity/wardrobe reference. Draw a completely different person described below. Same coarse dry charcoal/graphite pencil contours with visible imperfect grain, simple anime/storybook facial abstraction, tiny dash nose and small mouth, opaque muted flat matte color fills, sparse broad flat shadows, very few fold lines. No realistic pores, individual hair fibers, glossy rendering, elaborate watercolor, airbrushed portrait, detailed wrinkles, 3D, cinematic light. One isolated character from crown to upper thighs, square transparent canvas, arms resting naturally below chest, generous margins. Do not copy reference young man, navy sweater, school shirt, face or haircut; do not draw the player girl, blue bob, flower hairpin or florist apron. No sheet, no text, no scenery. NEW CHARACTER IDENTITY: A middle-aged Vietnamese man around45 with stocky broad build and round friendly face, short dark-brown hair with slightly uneven fringe, thick gently arched eyebrows, warm brown simple anime eyes, a small neat dark moustache. Wears a muted ochre short-sleeve open-collar casual button shirt with a plain chest pocket, dark brown trousers. No sweater, no uniform, no jacket, no glasses, no hat, no apron. Three-quarter standing portrait, both arms lowered naturally. Friendly easygoing neutral expression with small closed smile, slightly sheepish charm. Distinct adult face and build, not elderly or teenage.",
+  "size": "1024x1024",
+  "background": "transparent",
+  "image": {
+    "path": "asset-source/characters/customer-one/01.png",
+    "sha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd",
+    "encoding": "data:image/png;base64"
+  },
+  "mood": "neutral"
+}

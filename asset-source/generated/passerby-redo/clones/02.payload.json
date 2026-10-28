@@ -1,0 +1,12 @@
+{
+  "model": "cx/gpt-image-2.5",
+  "prompt": "Edit the supplied ORIGINAL game sprite, do not redesign or redraw a different character. Keep the exact same illustration, proportions, composition, pose, clothes, hands on hips, hair outline, jade bead necklace and jade wrist bangle, and coarse pencil linework. Maintain neutral composed facial expression: relaxed natural dark eyebrows, calm steady open dark eyes, neutral closed mouth, calm stoic demeanor, head facing straight forward without tilt. Match original's rough charcoal pencil outlines and opaque flat matte colors; do not polish, add texture, hair strands, realistic skin, or watercolor shading. Keep original square transparent framing.",
+  "size": "1024x1024",
+  "background": "transparent",
+  "image": {
+    "path": "asset-source/characters/passerby/02.png",
+    "sha256": "9a5b9dfa7f8219d38ac5c8e1a74d5022c2739c0fd8b0a1394da53ed9f1b022fc",
+    "encoding": "data:image/png;base64"
+  },
+  "mood": "neutral"
+}

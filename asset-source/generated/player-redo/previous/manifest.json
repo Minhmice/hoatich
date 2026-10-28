@@ -1,0 +1,42 @@
+[
+  {
+    "path": "asset-source/characters/player/04.png",
+    "backup": "asset-source/generated/player-redo/previous/04-source.png",
+    "sha256": "1465147cdaba9f25200bf43af4e0219a7cf4dbaaee98be7328c963fe97456e74"
+  },
+  {
+    "path": "public/assets/characters/player/04.webp",
+    "backup": "asset-source/generated/player-redo/previous/04-runtime.webp",
+    "sha256": "7556d070983eb2c8d1cf9484558941c84fbdb7150691ad509876b3ee2810b999"
+  },
+  {
+    "path": "asset-source/characters/player/05.png",
+    "backup": "asset-source/generated/player-redo/previous/05-source.png",
+    "sha256": "636cb9faf978f01a1550aa6601eee85f52a62ce5a6c5f4362273727911e68292"
+  },
+  {
+    "path": "public/assets/characters/player/05.webp",
+    "backup": "asset-source/generated/player-redo/previous/05-runtime.webp",
+    "sha256": "1fa289281f64d5841a8cd911e172674dcb7bea29c4af9f8702de62eb1dc7c6b1"
+  },
+  {
+    "path": "asset-source/characters/player/06.png",
+    "backup": "asset-source/generated/player-redo/previous/06-source.png",
+    "sha256": "1e1a5a6de6c22abab8a096e6196ce3f449fac553af45cf8673a382f6b5d9f812"
+  },
+  {
+    "path": "public/assets/characters/player/06.webp",
+    "backup": "asset-source/generated/player-redo/previous/06-runtime.webp",
+    "sha256": "7e3aba2e80f5c2b431dda209edc9479cc158eeea452c2a0a772eec11be3da712"
+  },
+  {
+    "path": "asset-source/characters/player/07.png",
+    "backup": "asset-source/generated/player-redo/previous/07-source.png",
+    "sha256": "98c5b1a09506899b5cd7ed66255179b466d9975abc23684891c3c994c1d72647"
+  },
+  {
+    "path": "public/assets/characters/player/07.webp",
+    "backup": "asset-source/generated/player-redo/previous/07-runtime.webp",
+    "sha256": "b1c755d758e0d7cc92577f7c530b5d1662d2c04e88ed437f14f0d86bb31bc3fa"
+  }
+]

@@ -1,0 +1,218 @@
+[
+  {
+    "id": "bac-ba",
+    "index": "01",
+    "mood": "neutral",
+    "file": "asset-source/generated/new-character-style/bac-ba/01.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "reference": "asset-source/characters/customer-one/01.png",
+    "referenceSha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd",
+    "sha256": "c61b2e543b6ba6f705e7e65e03cd4a16744e3f850fc68bd19f98ac07961fd75a",
+    "bytes": 819175,
+    "generatedAt": "2026-10-25T13:31:05.490Z",
+    "source": "asset-source/characters/bac-ba/01.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/bac-ba/01.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "408987b1244e93b576e0cb4e99efeb80802f5cb98ce3042fd54998c2aa8c3f8f"
+  },
+  {
+    "id": "chu-tu",
+    "index": "01",
+    "mood": "neutral",
+    "file": "asset-source/generated/new-character-style/chu-tu/01.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "reference": "asset-source/characters/customer-one/01.png",
+    "referenceSha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd",
+    "sha256": "b6071271a44490703e2ebe0064babb803b8af14ed9c37803bb5366794d6a2dad",
+    "bytes": 861668,
+    "generatedAt": "2026-10-25T13:31:11.844Z",
+    "source": "asset-source/characters/chu-tu/01.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/chu-tu/01.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "fab68d1ca1407a0022824220a587c0235a17a1722b4d533e69d1d19af834c573"
+  },
+  {
+    "id": "spirit-poet",
+    "index": "01",
+    "mood": "neutral",
+    "file": "asset-source/generated/new-character-style/spirit-poet/01.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "reference": "asset-source/characters/customer-one/01.png",
+    "referenceSha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd",
+    "sha256": "aa6af250719d37347c8b47b7329d6a456f47969a7460dbfe0c53a2f4f09df853",
+    "bytes": 861185,
+    "generatedAt": "2026-10-25T13:31:22.172Z",
+    "source": "asset-source/characters/spirit-poet/01.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/spirit-poet/01.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "065259d92d9ce58ddec2b8d91e3d4889745126fa5e273c54e3487eb8ff0a4a6d"
+  },
+  {
+    "id": "bac-ba",
+    "index": "02",
+    "mood": "sad",
+    "file": "asset-source/generated/new-character-style/bac-ba/02.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "reference": "asset-source/generated/new-character-style/bac-ba/01.png",
+    "referenceSha256": "c61b2e543b6ba6f705e7e65e03cd4a16744e3f850fc68bd19f98ac07961fd75a",
+    "sha256": "027ced288c1047a0ad7a914ad254a895d4d67a78fc5da9576c355125eb465209",
+    "bytes": 795858,
+    "generatedAt": "2026-10-25T13:33:01.472Z",
+    "source": "asset-source/characters/bac-ba/02.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/bac-ba/02.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "9295e0c73f86e5116ff0a9fcb4d514be6d0e6eb0d87fc2f1cd669a5c80737c5b"
+  },
+  {
+    "id": "spirit-poet",
+    "index": "02",
+    "mood": "sorrow",
+    "file": "asset-source/generated/new-character-style/spirit-poet/02.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "reference": "asset-source/generated/new-character-style/spirit-poet/01.png",
+    "referenceSha256": "aa6af250719d37347c8b47b7329d6a456f47969a7460dbfe0c53a2f4f09df853",
+    "sha256": "61737f3f3e26704263dd39e56fa619a2babdec27667856d38f4676057b122114",
+    "bytes": 817877,
+    "generatedAt": "2026-10-25T13:33:07.374Z",
+    "source": "asset-source/characters/spirit-poet/02.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/spirit-poet/02.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "0dc94c2625e890731faa7352ea8fae075b843cc06e2c403d472a4fafcf5f32dd"
+  },
+  {
+    "id": "chu-tu",
+    "index": "02",
+    "mood": "worried",
+    "file": "asset-source/generated/new-character-style/chu-tu/02.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "reference": "asset-source/generated/new-character-style/chu-tu/01.png",
+    "referenceSha256": "b6071271a44490703e2ebe0064babb803b8af14ed9c37803bb5366794d6a2dad",
+    "sha256": "8af08322612577ed45f995626c35206da63c7fa4d2d101aeb1da1872630d55fb",
+    "bytes": 871717,
+    "generatedAt": "2026-10-25T13:33:08.867Z",
+    "source": "asset-source/characters/chu-tu/02.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/chu-tu/02.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "0d054e4244ee4bd4eacec25977dd2c3e64a7b88851533c680df4c3d8ee0862dc"
+  },
+  {
+    "id": "bac-ba",
+    "index": "03",
+    "mood": "peaceful",
+    "file": "asset-source/generated/new-character-style/bac-ba/03.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "reference": "asset-source/generated/new-character-style/bac-ba/01.png",
+    "referenceSha256": "c61b2e543b6ba6f705e7e65e03cd4a16744e3f850fc68bd19f98ac07961fd75a",
+    "sha256": "731c8033dc3371ff24c124cbb5e556a92ded9e32a37d252de3a2db98d06b3d7c",
+    "bytes": 799585,
+    "generatedAt": "2026-10-25T13:33:48.166Z",
+    "source": "asset-source/characters/bac-ba/03.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/bac-ba/03.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "92c63f2b334e9733b1d29d61956ff37bf8f18a569ca01bcb7e6dc7d142fd1178"
+  },
+  {
+    "id": "spirit-poet",
+    "index": "03",
+    "mood": "peaceful",
+    "file": "asset-source/generated/new-character-style/spirit-poet/03.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "reference": "asset-source/generated/new-character-style/spirit-poet/01.png",
+    "referenceSha256": "aa6af250719d37347c8b47b7329d6a456f47969a7460dbfe0c53a2f4f09df853",
+    "sha256": "6399b206bd95d9626930af7cb330aea2a4f33d7860c251e1173757bba9490bb4",
+    "bytes": 839045,
+    "generatedAt": "2026-10-25T13:33:56.027Z",
+    "source": "asset-source/characters/spirit-poet/03.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/spirit-poet/03.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "005afb0818aa5dba7c43d99d77f56c1e105837654558ab4bccea564fbc3c2309"
+  },
+  {
+    "id": "chu-tu",
+    "index": "03",
+    "mood": "happy",
+    "file": "asset-source/generated/new-character-style/chu-tu/03.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "reference": "asset-source/generated/new-character-style/chu-tu/01.png",
+    "referenceSha256": "b6071271a44490703e2ebe0064babb803b8af14ed9c37803bb5366794d6a2dad",
+    "sha256": "d5bee4ea794d92c97a32578ef2ec9b42cae1eb25e042fa00e5930d31c55a64ea",
+    "bytes": 867135,
+    "generatedAt": "2026-10-25T13:34:32.231Z",
+    "source": "asset-source/characters/chu-tu/03.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/chu-tu/03.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "7777a697b606381441b6926bba7dcdc6650c4d539c324ca5d5e3c694441f8b26"
+  }
+]

@@ -1,7 +1,16 @@
 node_modules
 dist
+dist-debug
 .superpowers
 DEMO_assets
 .DS_Store
 *.local
 .vite
+graphify-out/
+.next
+out
+*.tsbuildinfo
+.omp/
+.serena/
+__pycache__/
+*.pyc

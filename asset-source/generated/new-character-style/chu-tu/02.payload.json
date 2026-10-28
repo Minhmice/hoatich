@@ -1,0 +1,12 @@
+{
+  "model": "cx/gpt-image-2.5",
+  "prompt": "Edit this specific original neutral character sprite. Retain exactly this person's identity, age, hairstyle, glasses or moustache if present, face proportions, clothing layers, drawing style, pose, hand placement and framing. Change ONLY eyebrows, eyes and small mouth to: sheepish worried expression, inner eyebrows raised and one brow slightly uneven, small awkward closed mouth; no head scratching, arms unchanged. No head tilt, no new props, no hand gestures. Keep rough dry pencil contours and simple opaque muted matte colors; do not add realism, watercolor, hair strands, polished vector lines or glossy shading. One sprite on transparent background, same generous square framing. Do not add bright colored outline flecks, no red/green/blue edge fringe, no white halo. ",
+  "size": "1024x1024",
+  "background": "transparent",
+  "image": {
+    "path": "asset-source/generated/new-character-style/chu-tu/01.png",
+    "sha256": "b6071271a44490703e2ebe0064babb803b8af14ed9c37803bb5366794d6a2dad",
+    "encoding": "data:image/png;base64"
+  },
+  "mood": "worried"
+}

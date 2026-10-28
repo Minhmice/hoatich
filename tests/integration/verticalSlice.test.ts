@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { BouquetModel } from '../../src/game/bouquet/BouquetModel';
 import { GameSession, INTRO_DIALOGUE_ID } from '../../src/game/GameSession';
+import { createInitialGameState } from '../../src/game/state/GameState';
+import { getCardChoices, getFeatures, getOrderArrangement } from '../../src/game/content/progression';
+import type { BouquetSubmission } from '../../src/game/content/types';
 import type { GameState } from '../../src/game/state/GameState';
 import type { LoadResult, SaveRepository } from '../../src/game/save/SaveRepository';
 
@@ -26,6 +29,7 @@ class FailingSaveRepository extends MemorySaveRepository {
     throw new Error('quota exceeded');
   }
 }
+
 function advanceUntilCanCompose(session: GameSession, maxSteps = 15): void {
   for (let i = 0; i < maxSteps; i++) {
     if (session.canCompose || !session.currentOrder) break;
@@ -38,6 +42,49 @@ function advanceUntilCanCompose(session: GameSession, maxSteps = 15): void {
   }
 }
 
+function makeValidSubmission(session: GameSession, orderId: string): BouquetSubmission {
+  const order = session.currentOrder;
+  if (!order || order.id !== orderId) {
+    throw new Error(`Order ${orderId} is not active in session`);
+  }
+  const arrangement = getOrderArrangement(order.id);
+  const dayFeatures = getFeatures(order.dayId);
+  const model = new BouquetModel({
+    vessel: arrangement.suggestedVessel,
+    stemCount: arrangement.minStems,
+  });
+
+  for (const req of order.explicitRequirements) {
+    if (req.kind === 'flower') {
+      for (let i = 0; i < (req.min ?? 1); i++) {
+        if (model.items.length < arrangement.minStems) {
+          model.add(req.value);
+        }
+      }
+    }
+  }
+  const filler = order.explicitRequirements.find((r) => r.kind === 'flower')?.value || session.state.unlockedFlowerIds[0];
+  while (model.items.length < arrangement.minStems) {
+    model.add(filler);
+  }
+
+  if (order.requiredFinish?.paper && dayFeatures.paper) {
+    model.setPaper(order.requiredFinish.paper);
+  }
+  if (order.requiredFinish?.ribbon && dayFeatures.ribbon) {
+    model.setRibbon(order.requiredFinish.ribbon);
+    model.advanceBow();
+    model.advanceBow();
+    model.advanceBow();
+  }
+  if (order.requiredFinish?.requireCard && dayFeatures.cards) {
+    const choices = getCardChoices(order.id);
+    const targetTone = order.requiredFinish.targetTone;
+    const matchingCard = choices.find((c) => c.tone === targetTone) || choices[0];
+    model.setCard(matchingCard.id);
+  }
+  return model.submission;
+}
 
 describe('GameSession persistence failures', () => {
   it('reports background save failures', async () => {
@@ -66,263 +113,359 @@ describe('GameSession persistence failures', () => {
   });
 });
 
-describe('Vertical Slice Integration: GameSession & 4-Order Narrative Loop', () => {
-  it('runs the full vertical slice: intro, dialogue choices, bouquet composition, 3 outcomes, reload persistence, shift and day cycle, and demo completion', async () => {
+describe('Strict BouquetSubmission invariants & exact-once stock', () => {
+  it('enforces strict BouquetSubmission validation contracts', () => {
+    const session = new GameSession();
+    session.advanceDialogue('choice-intro-start');
+    advanceUntilCanCompose(session);
+    expect(session.canCompose).toBe(true);
+
+    // Non-object submission
+    expect(() => session.deliver(null as unknown as BouquetSubmission)).toThrow(/Invalid bouquet submission/);
+
+    // Unconfigured model submission attempt
+    const unconfigured = new BouquetModel();
+    expect(() => session.deliver(unconfigured as unknown as BouquetSubmission)).toThrow();
+
+    // Incomplete stems submission attempt
+    const incompleteModel = new BouquetModel({ vessel: 'bouquet', stemCount: 5 });
+    incompleteModel.add('hoa-cuc-trang');
+    expect(() => incompleteModel.submission).toThrow(/not full/);
+
+    // Locked flower attempt
+    const lockedFlowerModel = new BouquetModel({ vessel: 'bouquet', stemCount: 3 });
+    lockedFlowerModel.add('hoa-luu-ly');
+    lockedFlowerModel.add('hoa-luu-ly');
+    lockedFlowerModel.add('hoa-luu-ly');
+    expect(() => session.deliver(lockedFlowerModel.submission)).toThrow(/Flower is locked/);
+    // Finish ribbon bow incomplete
+    const modelWithRibbon = new BouquetModel({ vessel: 'bouquet', stemCount: 3 });
+    modelWithRibbon.add('hoa-cuc-trang');
+    modelWithRibbon.add('hoa-cuc-trang');
+    modelWithRibbon.add('hoa-cuc-trang');
+    modelWithRibbon.setRibbon('sage'); // bowStep = 0
+    expect(() => session.deliver(modelWithRibbon.submission)).toThrow();
+  });
+
+  it('refuses delivery during ongoing dialogue and preserves state atomically', () => {
+    const session = new GameSession();
+    session.advanceDialogue('choice-intro-start');
+    const order = session.currentOrder!;
+    expect(order.id).toBe('order-01-bac-ba');
+    expect(session.dialogue?.id).toBe(order.openingDialogueId);
+    expect(session.canCompose).toBe(false);
+
+    const initialInventory = { ...session.state.inventory };
+    const initialCompleted = [...session.state.completedOrderIds];
+    const initialAffinity = session.state.npcProgress['bac-ba'].affinity;
+
+    // Prepare valid submission
+    const validSubmission = makeValidSubmission(session, order.id);
+
+    // 1. Attempt delivery during opening dialogue
+    expect(() => session.deliver(validSubmission)).toThrow('Cannot deliver bouquet while dialogue is active.');
+    expect(session.state.inventory).toEqual(initialInventory);
+    expect(session.state.completedOrderIds).toEqual(initialCompleted);
+    expect(session.state.npcProgress['bac-ba'].affinity).toBe(initialAffinity);
+
+    // 2. Request order detail -> detail dialogue is active
+    session.requestOrderDetail();
+    expect(session.dialogue?.id).toBe('dlg-order-01-bac-ba-detail');
+    expect(session.canCompose).toBe(false);
+    expect(() => session.deliver(validSubmission)).toThrow('Cannot deliver bouquet while dialogue is active.');
+    expect(session.state.inventory).toEqual(initialInventory);
+    expect(session.state.completedOrderIds).toEqual(initialCompleted);
+
+    // 3. Test delivery rejection during result dialogue
+    const resultDialogueState: GameState = {
+      ...session.state,
+      activeDialogueId: order.resultDialogueIds.accepted,
+    };
+    const sessionWithResultDialogue = new GameSession(resultDialogueState);
+    expect(sessionWithResultDialogue.canCompose).toBe(false);
+    expect(() => sessionWithResultDialogue.deliver(validSubmission)).toThrow('Cannot deliver bouquet while dialogue is active.');
+    expect(session.state.inventory).toEqual(initialInventory);
+    expect(session.state.completedOrderIds).toEqual(initialCompleted);
+    // Finish dialogue to reach compose state
+    advanceUntilCanCompose(session);
+    expect(session.canCompose).toBe(true);
+
+    // Deliver successfully
+    const result = session.deliver(validSubmission);
+    expect(result.outcome).toMatch(/accepted|resonant/);
+    expect(session.state.completedOrderIds).toContain(order.id);
+  });
+
+  it('validates exact finish enums, bow steps, authored cards, and stem poses with zero state mutation', () => {
+    const session = new GameSession();
+    session.advanceDialogue('choice-intro-start');
+    advanceUntilCanCompose(session);
+    expect(session.canCompose).toBe(true);
+
+    const baseSubmission = makeValidSubmission(session, 'order-01-bac-ba');
+    const initialInventory = { ...session.state.inventory };
+    const initialCompleted = [...session.state.completedOrderIds];
+    const initialAffinity = session.state.npcProgress['bac-ba'].affinity;
+
+    // Invalid paper enum
+    expect(() =>
+      session.deliver({
+        ...baseSubmission,
+        finish: { ...baseSubmission.finish, paper: 'plastic' as unknown as 'kraft' },
+      }),
+    ).toThrow(/Invalid wrapping paper/);
+
+    // Invalid ribbon enum
+    expect(() =>
+      session.deliver({
+        ...baseSubmission,
+        finish: { ...baseSubmission.finish, ribbon: 'silk' as unknown as 'sage' },
+      }),
+    ).toThrow(/Invalid ribbon/);
+
+    // Invalid bowStep
+    expect(() =>
+      session.deliver({
+        ...baseSubmission,
+        finish: { ...baseSubmission.finish, bowStep: 5 as unknown as 0 },
+      }),
+    ).toThrow(/Invalid bowStep/);
+
+    // bowStep > 0 when ribbon is none
+    expect(() =>
+      session.deliver({
+        ...baseSubmission,
+        finish: { ...baseSubmission.finish, ribbon: 'none', bowStep: 2 as unknown as 0 },
+      }),
+    ).toThrow(/Bow step must be 0 when ribbon is none/);
+
+    // On Day 1 cards are not unlocked yet, so test that card delivery throws card not unlocked
+    expect(() =>
+      session.deliver({
+        ...baseSubmission,
+        finish: { ...baseSubmission.finish, cardId: 'unauthored-card-id' },
+      }),
+    ).toThrow('Cards are not unlocked yet.');
+
+    // Construct Day 4 session where cards are unlocked to test card boundary validation
+    const day4State: GameState = {
+      ...session.state,
+      currentDay: 'day-4',
+    };
+    const day4Session = new GameSession(day4State);
+
+    // Non-authored card ID
+    expect(() =>
+      day4Session.deliver({
+        ...baseSubmission,
+        finish: { ...baseSubmission.finish, cardId: 'unauthored-card-id' },
+      }),
+    ).toThrow(/not an authored choice/);
+
+    // Non-string card ID
+    expect(() =>
+      day4Session.deliver({
+        ...baseSubmission,
+        finish: { ...baseSubmission.finish, cardId: 12345 as unknown as string },
+      }),
+    ).toThrow(/Invalid card ID/);
+    // Missing / invalid pose
+    const missingPoseItems = baseSubmission.items.map((it, idx) =>
+      idx === 0 ? ({ ...it, pose: undefined } as unknown as typeof it) : it,
+    );
+    expect(() =>
+      session.deliver({
+        ...baseSubmission,
+        items: missingPoseItems,
+      }),
+    ).toThrow(/Invalid or missing pose/);
+
+    const invalidPoseItems = baseSubmission.items.map((it, idx) =>
+      idx === 0 ? ({ ...it, pose: 'diagonal' } as unknown as typeof it) : it,
+    );
+    expect(() =>
+      session.deliver({
+        ...baseSubmission,
+        items: invalidPoseItems,
+      }),
+    ).toThrow(/Invalid or missing pose/);
+
+    // Non-finite coordinates
+    const invalidCoordItems = baseSubmission.items.map((it, idx) =>
+      idx === 0 ? { ...it, position: { x: NaN, y: 0 } } : it,
+    );
+    expect(() =>
+      session.deliver({
+        ...baseSubmission,
+        items: invalidCoordItems,
+      }),
+    ).toThrow(/finite coordinates/);
+
+    // Duplicate stem item id
+    const duplicateIdItems = baseSubmission.items.map((it) => ({ ...it, id: 'stem-dup-id' }));
+    expect(() =>
+      session.deliver({
+        ...baseSubmission,
+        items: duplicateIdItems,
+      }),
+    ).toThrow(/Duplicate stem item id/);
+
+    // Verify zero state mutation across all rejections
+    expect(session.state.inventory).toEqual(initialInventory);
+    expect(session.state.completedOrderIds).toEqual(initialCompleted);
+    expect(session.state.npcProgress['bac-ba'].affinity).toBe(initialAffinity);
+  });
+
+  it('charges inventory exactly once per bouquet flower and prevents duplicate delivery', () => {
+    const session = new GameSession();
+    session.advanceDialogue('choice-intro-start');
+    advanceUntilCanCompose(session);
+
+    const initialStock = session.state.inventory['hoa-cuc-trang'];
+    expect(initialStock).toBe(30);
+
+    const submission = makeValidSubmission(session, 'order-01-bac-ba');
+    const stemCount = submission.items.length;
+    expect(stemCount).toBe(3);
+
+    const result = session.deliver(submission);
+    expect(result.outcome).toBe('accepted');
+    expect(session.state.inventory['hoa-cuc-trang']).toBe(initialStock - stemCount);
+    expect(session.state.completedOrderIds).toContain('order-01-bac-ba');
+
+    // Duplicate delivery on same order must throw
+    expect(() => session.deliver(submission)).toThrow(/already been delivered/);
+  });
+});
+
+describe('Vertical Slice Integration: Full 6-Day Loop & Branch Routing', () => {
+  it('completes the good route across all 6 days to demo completion', async () => {
     const saveRepo = new MemorySaveRepository();
     const session = new GameSession(undefined, saveRepo);
 
-    // --- 1. Initial State & Intro Greeting ---
     expect(session.state.currentDay).toBe('day-1');
     expect(session.state.currentShift).toBe('living');
-    expect(session.state.completedOrderIds).toHaveLength(0);
-    expect(session.state.flags.flag_intro_seen).toBeUndefined();
-
-    // Initial greeting presents aunt's shop creed and night perception
     expect(session.dialogue?.id).toBe(INTRO_DIALOGUE_ID);
-    expect(session.dialogue?.speakerId).toBe('player');
 
-    // Advance intro: unlocks creed into journal and automatically starts first order
-    const introStep = session.advanceDialogue('choice-intro-start');
-    expect(introStep.isFinished).toBe(false);
+    session.advanceDialogue('choice-intro-start');
     expect(session.state.flags.flag_intro_seen).toBe(true);
-    expect(session.state.journalEntryIds).toContain('journal_aunt_shop_creed');
-    expect(session.currentOrder?.id).toBe('order-01-bac-ba');
 
-    // --- 2. Order 1: Bác Ba (Day 1 - Living shift, deceased recipient) ---
-    expect(session.dialogue?.id).toBe('dlg-bacba-01');
-    // Inquire about wife memory (sets flag_knows_bac_ba_wife_memory)
-    session.advanceDialogue('choice-bacba-01-memory');
-    expect(session.state.flags.flag_knows_bac_ba_wife_memory).toBe(true);
+    for (let day = 1; day <= 6; day++) {
+      // Living shift orders
+      const livingOrders = session.getOrdersForCurrentShift();
+      for (const order of livingOrders) {
+        if (session.currentOrder?.id !== order.id) {
+          session.startOrder(order.id);
+        }
+        advanceUntilCanCompose(session);
+        expect(session.canCompose).toBe(true);
 
-    // Walk through advice to ready node
-    advanceUntilCanCompose(session);
-    expect(session.canCompose).toBe(true);
-    expect(session.currentOrder?.id).toBe('order-01-bac-ba');
+        const sub = makeValidSubmission(session, order.id);
+        const res = session.deliver(sub);
+        expect(res.outcome).toMatch(/accepted|resonant/);
+        session.advanceDialogue(); // dismiss result dialogue
+      }
 
-    // 2A. Test MISSED outcome (taboo: dead flower in living shift order, or wrong flowers)
-    const missedBouquet = new BouquetModel();
-    // Add hoa-hong-do instead of required hoa-cuc-trang
-    missedBouquet.add('hoa-hong-do');
-    const missedResult = session.deliver(missedBouquet);
-    expect(missedResult.outcome).toBe('missed');
-    expect(session.dialogue?.id).toBe('dlg-bacba-result-missed');
-    // On missed, inventory is not consumed and order is not completed so player can retry
-    expect(session.state.completedOrderIds).not.toContain('order-01-bac-ba');
-    expect(session.state.inventory['hoa-hong-do']).toBe(12);
+      expect(session.isShiftComplete).toBe(true);
+      session.advanceShift(); // advance to dead
 
-    // Player retries order
-    session.retryMissed();
-    expect(session.dialogue?.id).toBe('dlg-bacba-01');
+      // Dead shift orders
+      const deadOrders = session.getOrdersForCurrentShift();
+      for (const order of deadOrders) {
+        if (session.currentOrder?.id !== order.id) {
+          session.startOrder(order.id);
+        }
+        advanceUntilCanCompose(session);
+        expect(session.canCompose).toBe(true);
 
-    // Fast-forward to ready node
-    session.advanceDialogue('choice-bacba-01-memory');
-    advanceUntilCanCompose(session);
-    expect(session.canCompose).toBe(true);
+        const sub = makeValidSubmission(session, order.id);
+        const res = session.deliver(sub);
+        expect(res.outcome).toMatch(/accepted|resonant/);
+        session.advanceDialogue();
+      }
 
-    // 2B. Test RESONANT outcome (hoa-cuc-trang + hoa-thuy-tien with memory flag)
-    const resonantBouquet1 = new BouquetModel();
-    resonantBouquet1.add('hoa-cuc-trang');
-    resonantBouquet1.add('hoa-thuy-tien');
+      expect(session.isShiftComplete).toBe(true);
 
-    const result1 = session.deliver(resonantBouquet1);
-    expect(result1.outcome).toBe('resonant');
-    expect(result1.matchedRuleIds).toContain('rule-bacba-thuytien');
-    expect(session.state.completedOrderIds).toContain('order-01-bac-ba');
-    expect(session.state.inventory['hoa-cuc-trang']).toBe(11);
-    expect(session.state.inventory['hoa-thuy-tien']).toBe(11);
-    expect(session.state.relationshipScores['bac-ba']).toBeGreaterThanOrEqual(15);
-    expect(session.dialogue?.id).toBe('dlg-bacba-result-resonant');
+      if (day === 3) {
+        // After Day 3, high affinity qualifies the good branch
+        expect(session.state.npcProgress['bac-ba'].affinity).toBeGreaterThanOrEqual(70);
+      }
 
-    // Dismiss result dialogue
-    session.advanceDialogue();
-    expect(session.currentOrder).toBeUndefined();
+      if (day < 6) {
+        session.advanceShift(); // advance to next day living
+      }
+    }
 
-    // Shift cannot advance yet because Order 2 in Day 1 Living is still required
-    expect(session.isShiftComplete).toBe(false);
-    expect(() => session.advanceShift()).toThrow(/Chưa hoàn thành/);
+    // Day 4 active branch must be good
+    expect(session.state.npcProgress['bac-ba'].activeBranch).toBe('good');
+    expect(session.state.completedOrderIds).toHaveLength(24);
+    expect(session.complete).toBe(true);
+    expect(session.isDemoComplete).toBe(true);
 
-    // --- 3. Order 2: Cô Liên (Day 1 - Living shift, living recipient) ---
-    const order2 = session.startOrder('order-02-co-lien');
-    expect(order2.id).toBe('order-02-co-lien');
-    expect(session.dialogue?.id).toBe('dlg-colien-01');
-
-    // Choose direct order path
-    session.advanceDialogue('choice-colien-01-bright');
-    advanceUntilCanCompose(session);
-    expect(session.canCompose).toBe(true);
-
-    // Deliver ACCEPTED bouquet (hoa-huong-duong meets explicit requirement)
-    const acceptedBouquet2 = new BouquetModel();
-    acceptedBouquet2.add('hoa-huong-duong');
-    const result2 = session.deliver(acceptedBouquet2);
-    expect(result2.outcome).toBe('accepted');
-    expect(session.state.completedOrderIds).toContain('order-02-co-lien');
-    expect(session.state.inventory['hoa-huong-duong']).toBe(11);
-    expect(session.dialogue?.id).toBe('dlg-colien-result-accepted');
-
-    // Dismiss result dialogue
-    session.advanceDialogue();
-    expect(session.currentOrder).toBeUndefined();
-
-    // Now Day 1 Living shift is complete!
-    expect(session.isShiftComplete).toBe(true);
-
-    // Advance shift to 'dead'
-    const shiftTransition1 = session.advanceShift();
-    expect(shiftTransition1.shift).toBe('dead');
-    expect(session.state.currentShift).toBe('dead');
+    // Reset game cleans up back to initial state
+    await session.resetGame();
+    expect(session.state.completedOrderIds).toHaveLength(0);
     expect(session.state.currentDay).toBe('day-1');
-
-    // --- 4. Order 3: Hồn Thi Sĩ (Day 1 - Dead shift, deceased recipient) ---
-    const order3 = session.startOrder('order-03-linh-hon');
-    expect(order3.id).toBe('order-03-linh-hon');
-    expect(session.dialogue?.id).toBe('dlg-spirit-01');
-
-    // Backstory choice unlocks poem truth flag
-    session.advanceDialogue('choice-spirit-01-story');
-    expect(session.state.flags.flag_knows_spirit_poem_truth).toBe(true);
-    advanceUntilCanCompose(session);
-    expect(session.state.unlockedFlowerIds).toContain('hoa-hoang-tuyen');
-    expect(session.state.unlockedFlowerIds).toContain('hoa-da-ngan');
-    expect(session.state.journalEntryIds).toContain('journal_aunt_hoang_tuyen');
-    expect(session.state.journalEntryIds).toContain('journal_aunt_da_ngan');
-    expect(session.state.inventory['hoa-hoang-tuyen']).toBe(12);
-    expect(session.state.inventory['hoa-da-ngan']).toBe(12);
-    expect(session.canCompose).toBe(true);
-
-    // --- 4B. Reload / Persistence Check: No Duplication Rewards or Stock Inflation ---
-    const reloaded = new GameSession(session.state, saveRepo);
-    expect(reloaded.state.inventory['hoa-hoang-tuyen']).toBe(12);
-    expect(reloaded.state.inventory['hoa-da-ngan']).toBe(12);
-    expect(reloaded.state.unlockedFlowerIds.filter((id) => id === 'hoa-hoang-tuyen')).toHaveLength(1);
-    expect(reloaded.currentOrder?.id).toBe('order-03-linh-hon');
-    expect(reloaded.canCompose).toBe(true);
-
-    // Deliver RESONANT bouquet with both unlocked fictional flowers
-    const resonantBouquet3 = new BouquetModel();
-    resonantBouquet3.add('hoa-hoang-tuyen');
-    resonantBouquet3.add('hoa-da-ngan');
-
-    const result3 = reloaded.deliver(resonantBouquet3);
-    expect(result3.outcome).toBe('resonant');
-    expect(result3.matchedRuleIds).toContain('rule-spirit-dangan');
-    expect(reloaded.state.completedOrderIds).toContain('order-03-linh-hon');
-    expect(reloaded.state.inventory['hoa-hoang-tuyen']).toBe(11);
-    expect(reloaded.state.inventory['hoa-da-ngan']).toBe(11);
-    expect(reloaded.dialogue?.id).toBe('dlg-spirit-result-resonant');
-
-    reloaded.advanceDialogue();
-    expect(reloaded.isShiftComplete).toBe(true);
-
-    // Advance shift from dead: advances to Day 2 in living shift!
-    const shiftTransition2 = reloaded.advanceShift();
-    expect(shiftTransition2.shift).toBe('living');
-    expect(shiftTransition2.dayId).toBe('day-2');
-    expect(reloaded.state.currentDay).toBe('day-2');
-    expect(reloaded.state.currentShift).toBe('living');
-
-    // --- 5. Order 4: Chú Tư Xe Ôm (Day 2 - Living shift, living recipient) ---
-    const order4 = reloaded.startOrder('order-04-chu-tu');
-    expect(order4.id).toBe('order-04-chu-tu');
-    expect(reloaded.dialogue?.id).toBe('dlg-chutu-01');
-
-    // Discover wife favorite story
-    reloaded.advanceDialogue('choice-chutu-01-secret');
-    expect(reloaded.state.flags.flag_knows_chu_tu_wife_favorite).toBe(true);
-
-    advanceUntilCanCompose(reloaded);
-    expect(reloaded.canCompose).toBe(true);
-
-    // Deliver RESONANT bouquet (hoa-hong-do + hoa-huong-duong)
-    const resonantBouquet4 = new BouquetModel();
-    resonantBouquet4.add('hoa-hong-do');
-    resonantBouquet4.add('hoa-huong-duong');
-
-    const result4 = reloaded.deliver(resonantBouquet4);
-    expect(result4.outcome).toBe('resonant');
-    expect(result4.matchedRuleIds).toContain('rule-chutu-huongduong');
-    expect(reloaded.state.completedOrderIds).toContain('order-04-chu-tu');
-    expect(reloaded.complete).toBe(true);
-    expect(reloaded.isDemoComplete).toBe(false);
-    expect(reloaded.dialogue?.id).toBe(result4.resultDialogueId);
-
-    // Checkpoint reload mid-reaction preserves reaction dialogue and isDemoComplete is false
-    const loadRes = await saveRepo.load();
-    const reloadedMidReaction = new GameSession(loadRes.status === 'loaded' ? loadRes.state : undefined, saveRepo);
-    expect(reloadedMidReaction.complete).toBe(true);
-    expect(reloadedMidReaction.isDemoComplete).toBe(false);
-    expect(reloadedMidReaction.dialogue?.id).toBe(result4.resultDialogueId);
-
-    reloaded.advanceDialogue(); // dismiss result dialogue
-
-    // --- 6. Demo Complete ---
-    expect(reloaded.isDemoComplete).toBe(true);
-    expect(reloaded.complete).toBe(true);
-    expect(reloaded.progress).toEqual({ completed: 4, total: 4 });
-    // --- 7. Reset Game (New Game Confirm) ---
-    await reloaded.resetGame();
-    expect(reloaded.state.completedOrderIds).toHaveLength(0);
-    expect(reloaded.state.currentDay).toBe('day-1');
-    expect(reloaded.state.currentShift).toBe('living');
-    expect(reloaded.progress).toEqual({ completed: 0, total: 4 });
+    expect(session.state.currentShift).toBe('living');
   });
 
-  it('restocks consumed flowers across shifts so order 1 using 12 roses does not block day 2', async () => {
-    const session = new GameSession();
-    session.advanceDialogue('choice-intro-start');
+  it('runs strained route from Day 4 and completes through Day 6', () => {
+    const state = createInitialGameState();
+    state.flags.flag_intro_seen = true;
+    state.completedOrderIds = [
+      'order-01-bac-ba', 'order-02-co-lien', 'order-01-chu-tu', 'order-03-linh-hon',
+      'order-02-01-bac-ba', 'order-02-02-co-lien', 'order-04-chu-tu', 'order-02-04-linh-hon',
+      'order-03-01-bac-ba', 'order-03-02-co-lien', 'order-03-03-chu-tu', 'order-03-04-linh-hon',
+    ];
+    state.currentDay = 'day-4';
+    state.currentShift = 'living';
+    state.unlockedFlowerIds = ['hoa-cuc-trang', 'hoa-hong-do', 'hoa-huong-duong', 'hoa-sen-hong'];
+    for (const f of state.unlockedFlowerIds) state.inventory[f] = 30;
 
-    advanceUntilCanCompose(session);
-    expect(session.canCompose).toBe(true);
-
-    // Compose order 1 with 1 hoa-cuc-trang and ALL 12 hoa-hong-do
-    const order1Bouquet = new BouquetModel();
-    order1Bouquet.add('hoa-cuc-trang');
-    for (let i = 0; i < 12; i++) {
-      order1Bouquet.add('hoa-hong-do');
+    for (const customerId of Object.keys(state.npcProgress)) {
+      state.npcProgress[customerId].activeBranch = 'strained';
+      state.npcProgress[customerId].completedDeliveries = 3;
+      state.npcProgress[customerId].affinity = 15;
+      state.relationshipScores[customerId] = 15;
     }
-    const result1 = session.deliver(order1Bouquet);
-    expect(result1.outcome).toBe('accepted');
-    expect(session.state.inventory['hoa-hong-do']).toBe(0);
 
-    session.advanceDialogue(); // dismiss result
+    const session = new GameSession(state);
+    expect(session.state.npcProgress['bac-ba'].activeBranch).toBe('strained');
 
-    // Complete order 2 (Co Lien)
-    session.startOrder();
-    advanceUntilCanCompose(session);
-    const order2Bouquet = new BouquetModel();
-    order2Bouquet.add('hoa-huong-duong');
-    session.deliver(order2Bouquet);
-    session.advanceDialogue();
+    for (let day = 4; day <= 6; day++) {
+      const livingOrders = session.getOrdersForCurrentShift();
+      for (const order of livingOrders) {
+        expect(order.branch).toBe('strained');
+        if (session.currentOrder?.id !== order.id) {
+          session.startOrder(order.id);
+        }
+        advanceUntilCanCompose(session);
+        const sub = makeValidSubmission(session, order.id);
+        session.deliver(sub);
+        session.advanceDialogue();
+      }
 
-    expect(session.isShiftComplete).toBe(true);
+      session.advanceShift();
 
-    // Advance shift from day-1 living to day-1 dead
-    session.advanceShift();
-    expect(session.state.currentShift).toBe('dead');
-    expect(session.state.inventory['hoa-hong-do']).toBe(12);
+      const deadOrders = session.getOrdersForCurrentShift();
+      for (const order of deadOrders) {
+        expect(order.branch).toBe('strained');
+        if (session.currentOrder?.id !== order.id) {
+          session.startOrder(order.id);
+        }
+        advanceUntilCanCompose(session);
+        const sub = makeValidSubmission(session, order.id);
+        session.deliver(sub);
+        session.advanceDialogue();
+      }
 
-    // Complete order 3 (Aunt Spirit in dead shift)
-    session.startOrder('order-03-linh-hon');
-    session.advanceDialogue('choice-spirit-01-story');
-    advanceUntilCanCompose(session);
-    const order3Bouquet = new BouquetModel();
-    order3Bouquet.add('hoa-hoang-tuyen');
-    order3Bouquet.add('hoa-da-ngan');
-    session.deliver(order3Bouquet);
-    session.advanceDialogue();
-    // Advance shift from day-1 dead to day-2 living
-    session.advanceShift();
-    expect(session.state.currentDay).toBe('day-2');
-    expect(session.state.currentShift).toBe('living');
-    expect(session.state.inventory['hoa-hong-do']).toBe(12);
+      if (day < 6) {
+        session.advanceShift();
+      }
+    }
 
-    // Order 4 (Chu Tu) requires hoa-hong-do
-    session.startOrder();
-    advanceUntilCanCompose(session);
-    const order4Bouquet = new BouquetModel();
-    order4Bouquet.add('hoa-hong-do');
-    const result4 = session.deliver(order4Bouquet);
-    expect(result4.outcome).toBe('accepted');
-    expect(session.state.completedOrderIds).toContain('order-04-chu-tu');
+    expect(session.state.completedOrderIds).toHaveLength(24);
+    expect(session.complete).toBe(true);
+    expect(session.isDemoComplete).toBe(true);
   });
 });

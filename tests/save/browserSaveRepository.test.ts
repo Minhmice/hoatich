@@ -28,16 +28,16 @@ describe('browser save repository', () => {
     const repository = createBrowserSaveRepository(fake);
     const session = new GameSession(undefined, repository);
     session.advanceDialogue('choice-intro-start');
-    session.advanceDialogue('choice-bacba-01-memory');
+    session.advanceDialogue('choice-order-01-bac-ba-detail');
     const result = await repository.load();
     expect(result).toMatchObject({
       status: 'loaded',
       state: {
-        activeDialogueId: 'dlg-bacba-03-memory',
+        activeDialogueId: 'dlg-order-01-bac-ba-detail',
         flags: {
           flag_intro_seen: true,
-          flag_knows_bac_ba_wife_memory: true,
-          'dlg_effect_applied_dlg-bacba-03-memory': true,
+          'flag_heard_detail_order-01-bac-ba': true,
+          'dlg_effect_applied_dlg-order-01-bac-ba-detail': true,
         },
       },
     });

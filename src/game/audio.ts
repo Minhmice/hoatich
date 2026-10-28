@@ -9,6 +9,8 @@ export class AudioManager {
   private sfxGain: GainNode | null = null;
   private ambientOscillators: OscillatorNode[] = [];
   private ambientLfo: OscillatorNode | null = null;
+  private currentShift: 'living' | 'dead' = 'living';
+  private ambientFilter: BiquadFilterNode | null = null;
   private musicVolume: number;
   private sfxVolume: number;
   private gestureAttached = false;
@@ -76,7 +78,9 @@ export class AudioManager {
       // Cozy ambient drone chord: D3 (146.83Hz), A3 (220Hz), F#3 (185Hz) with warm lowpass
       const filter = ctx.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(320, ctx.currentTime);
+      const initialCutoff = this.currentShift === 'dead' ? 240 : 320;
+      filter.frequency.setValueAtTime(initialCutoff, ctx.currentTime);
+      this.ambientFilter = filter;
       filter.connect(musicGain);
       // Subtle LFO modulation on cutoff for breathing feel
       this.ambientLfo = this.ctx.createOscillator();
@@ -87,7 +91,7 @@ export class AudioManager {
       lfoGain.connect(filter.frequency);
       this.ambientLfo.start();
 
-      const freqs = [146.83, 185.0, 220.0];
+      const freqs = [146.83, this.currentShift === 'dead' ? 174.61 : 185.0, 220.0];
       this.ambientOscillators = freqs.map((f, i) => {
         const osc = this.ctx!.createOscillator();
         osc.type = i === 1 ? 'triangle' : 'sine';
@@ -172,6 +176,16 @@ export class AudioManager {
     if (this.ctx && this.sfxGain) {
       this.sfxGain.gain.setValueAtTime(this.sfxVolume * 0.25, this.ctx.currentTime);
     }
+  }
+
+  public setShift(shift: 'living' | 'dead'): void {
+    this.currentShift = shift;
+    if (!this.ctx || !this.ambientFilter || this.ambientOscillators.length < 3) return;
+    const now = this.ctx.currentTime;
+    const midFreq = shift === 'dead' ? 174.61 : 185.0;
+    const targetCutoff = shift === 'dead' ? 240 : 320;
+    this.ambientOscillators[1].frequency.setTargetAtTime(midFreq, now, 1.2);
+    this.ambientFilter.frequency.setTargetAtTime(targetCutoff, now, 1.5);
   }
 
   private handleVisibilityChange(): void {

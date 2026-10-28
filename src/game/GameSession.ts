@@ -1,4 +1,6 @@
 import { contentBundle } from './content';
+import { DAY_SEQUENCE, getFeatures, getCardChoices } from './content/progression';
+import type { BouquetSubmission } from './content/types';
 import type {
   DialogueChoice,
   DialogueNode,
@@ -7,7 +9,6 @@ import type {
   Outcome,
   Shift,
 } from './content/types';
-import { BouquetModel, type BouquetItem } from './bouquet/BouquetModel';
 import { evaluateBouquet } from './bouquet/evaluateBouquet';
 import type { GameSettings, GameState } from './state/GameState';
 import { createInitialGameState } from './state/GameState';
@@ -97,10 +98,21 @@ export class GameSession {
     });
   }
 
+  public getPlayableOrders(): OrderDefinition[] {
+    const completedSet = new Set(this._state.completedOrderIds);
+    return contentBundle.orders.filter((order) => {
+      if (completedSet.has(order.id)) return true;
+      const completedSameEncounter = contentBundle.orders.some(
+        (o) => o.dayId === order.dayId && o.customerId === order.customerId && completedSet.has(o.id)
+      );
+      if (completedSameEncounter) return false;
+      const branch = this._state.npcProgress[order.customerId]?.activeBranch ?? 'neutral';
+      return order.branch === undefined ? true : order.branch === branch;
+    });
+  }
+
   get isShiftComplete(): boolean {
-    const shiftOrders = contentBundle.orders.filter(
-      (o) => o.dayId === this._state.currentDay && o.shift === this._state.currentShift,
-    );
+    const shiftOrders = this.getOrdersForCurrentShift();
     return (
       shiftOrders.length > 0 &&
       shiftOrders.every((o) => this._state.completedOrderIds.includes(o.id))
@@ -108,9 +120,10 @@ export class GameSession {
   }
 
   get complete(): boolean {
+    const playable = this.getPlayableOrders();
     return (
-      contentBundle.orders.length > 0 &&
-      contentBundle.orders.every((o) => this._state.completedOrderIds.includes(o.id))
+      playable.length > 0 &&
+      playable.every((o) => this._state.completedOrderIds.includes(o.id))
     );
   }
 
@@ -119,9 +132,10 @@ export class GameSession {
   }
 
   get progress(): { completed: number; total: number } {
+    const playable = this.getPlayableOrders();
     return {
       completed: this._state.completedOrderIds.length,
-      total: contentBundle.orders.length,
+      total: playable.length,
     };
   }
 
@@ -130,15 +144,17 @@ export class GameSession {
   }
 
   public getOrdersForCurrentShift(): OrderDefinition[] {
-    return contentBundle.orders.filter(
-      (o) => o.dayId === this._state.currentDay && o.shift === this._state.currentShift,
-    );
+    return contentBundle.orders.filter((order) => {
+      if (order.dayId !== this._state.currentDay || order.shift !== this._state.currentShift) return false;
+      const branch = this._state.npcProgress[order.customerId]?.activeBranch ?? 'neutral';
+      return order.branch === undefined ? true : order.branch === branch;
+    });
   }
 
   public startOrder(id?: string): OrderDefinition {
     let order: OrderDefinition | undefined;
     if (id) {
-      order = contentBundle.orders.find((o) => o.id === id);
+      order = this.getOrdersForCurrentShift().find((o) => o.id === id);
       if (!order) throw new Error(`Không tìm thấy đơn hàng với mã: ${id}`);
     } else {
       const candidates = this.getOrdersForCurrentShift();
@@ -157,6 +173,23 @@ export class GameSession {
     this.applyNodeEntryEffectsOnce(order.openingDialogueId);
     this.persistInBackground();
     return order;
+  }
+  public requestOrderDetail(): void {
+    const order = this.currentOrder;
+    if (!order) throw new Error('No active order for detail request.');
+    const flagId = `flag_heard_detail_${order.id}`;
+    if (this._state.flags[flagId]) throw new Error('Order detail was already heard.');
+    const detailDialogueId = `dlg-${order.id}-detail`;
+    const detailNode = contentBundle.dialogue.find((d) => d.id === detailDialogueId);
+    this._state = {
+      ...this._state,
+      flags: { ...this._state.flags, [flagId]: true },
+      activeDialogueId: detailNode ? detailNode.id : this._state.activeDialogueId,
+    };
+    if (detailNode) {
+      this.applyNodeEntryEffectsOnce(detailNode.id);
+    }
+    this.persistInBackground();
   }
 
   private applyNodeEntryEffectsOnce(nodeId: string): Effect[] {
@@ -281,31 +314,115 @@ export class GameSession {
     };
   }
 
-  public deliver(
-    bouquet: BouquetModel | readonly BouquetItem[],
-    options?: { completeIfMissed?: boolean },
-  ): DeliveryResult {
+  public deliver(submission: BouquetSubmission): DeliveryResult {
     const order = this.currentOrder;
-    if (!order) {
-      throw new Error('Không có đơn hàng nào đang hoạt động để trao hoa.');
+    if (!order) throw new Error('No active order to deliver.');
+    if (this._state.completedOrderIds.includes(order.id)) throw new Error('This order has already been delivered.');
+    if (this._state.activeDialogueId !== undefined || !this.canCompose) {
+      throw new Error('Cannot deliver bouquet while dialogue is active.');
     }
 
-    const items: readonly BouquetItem[] = bouquet instanceof BouquetModel ? bouquet.items : bouquet;
-    const flowerIds = items.map((i) => i.flowerId);
+    if (!submission || typeof submission !== 'object') {
+      throw new Error('Invalid bouquet submission: object required.');
+    }
+    if (!submission.configuration || typeof submission.configuration !== 'object') {
+      throw new Error('Invalid bouquet submission: configuration required.');
+    }
+    if (!Array.isArray(submission.items)) {
+      throw new Error('Invalid bouquet submission: items array required.');
+    }
+    if (!submission.finish || typeof submission.finish !== 'object') {
+      throw new Error('Invalid bouquet submission: finish metadata required.');
+    }
 
-    // Validate inventory stock
-    const counts: Record<string, number> = {};
-    for (const fId of flowerIds) counts[fId] = (counts[fId] ?? 0) + 1;
-    for (const [fId, count] of Object.entries(counts)) {
-      const stock = this._state.inventory[fId] ?? 0;
-      if (stock < count) {
-        throw new Error(`Không đủ hoa trong kho cho "${fId}": cần ${count}, còn ${stock}`);
+    const { configuration, items, finish } = submission;
+    if (!['bouquet', 'vase', 'jar'].includes(configuration.vessel)) {
+      throw new Error(`Invalid vessel: ${configuration.vessel}`);
+    }
+    if (
+      !Number.isInteger(configuration.stemCount) ||
+      configuration.stemCount < 1 ||
+      configuration.stemCount > 24
+    ) {
+      throw new Error('Bouquet stem count must be between 1 and 24.');
+    }
+    if (items.length !== configuration.stemCount) {
+      throw new Error('Bouquet must contain exactly the configured number of stems.');
+    }
+
+    const seenSlots = new Set<number>();
+    const seenItemIds = new Set<string>();
+    for (const item of items) {
+      if (!item || typeof item !== 'object') {
+        throw new Error('Bouquet stem item must be an object.');
+      }
+      if (typeof item.id !== 'string' || item.id.length === 0) {
+        throw new Error('Bouquet stem item must have a non-empty string id.');
+      }
+      if (seenItemIds.has(item.id)) {
+        throw new Error(`Duplicate stem item id: ${item.id}`);
+      }
+      seenItemIds.add(item.id);
+
+      if (typeof item.flowerId !== 'string' || !contentBundle.flowers.some((f) => f.id === item.flowerId)) {
+        throw new Error(`Unknown flower ID: ${item.flowerId}`);
+      }
+      if (!item.position || typeof item.position !== 'object' || !Number.isFinite(item.position.x) || !Number.isFinite(item.position.y)) {
+        throw new Error('Bouquet stem item position must have finite coordinates.');
+      }
+      if (!Number.isFinite(item.rotation)) {
+        throw new Error('Bouquet stem item rotation must be a finite number.');
+      }
+
+      if (!Number.isInteger(item.slotIndex) || item.slotIndex < 0 || item.slotIndex >= configuration.stemCount) {
+        throw new Error(`Invalid slotIndex: ${item.slotIndex}`);
+      }
+      if (seenSlots.has(item.slotIndex)) {
+        throw new Error(`Duplicate slotIndex in items: ${item.slotIndex}`);
+      }
+      seenSlots.add(item.slotIndex);
+      if (!item.pose || !['center', 'left', 'right', 'down'].includes(item.pose)) {
+        throw new Error(`Invalid or missing pose: ${item.pose}`);
       }
     }
 
-    const evaluation = evaluateBouquet(order, bouquet, { flags: this._state.flags });
-    const resultDialogueId = order.resultDialogueIds[evaluation.outcome];
+    if (!['none', 'kraft', 'cream'].includes(finish.paper)) {
+      throw new Error(`Invalid wrapping paper: ${finish.paper}`);
+    }
+    if (!['none', 'sage', 'rose'].includes(finish.ribbon)) {
+      throw new Error(`Invalid ribbon: ${finish.ribbon}`);
+    }
+    if (!Number.isInteger(finish.bowStep) || ![0, 1, 2, 3].includes(finish.bowStep)) {
+      throw new Error(`Invalid bowStep: ${finish.bowStep}`);
+    }
+    if (finish.ribbon === 'none' && finish.bowStep !== 0) {
+      throw new Error('Bow step must be 0 when ribbon is none.');
+    }
+    if (finish.ribbon !== 'none' && finish.bowStep !== 3) {
+      throw new Error('Finish the ribbon bow before delivery.');
+    }
 
+    const features = getFeatures(this._state.currentDay);
+    if (!features.paper && finish.paper !== 'none') throw new Error('Wrapping paper is not unlocked yet.');
+    if (!features.ribbon && (finish.ribbon !== 'none' || finish.bowStep !== 0)) throw new Error('Ribbon finishing is not unlocked yet.');
+    if (!features.cards && finish.cardId !== null) throw new Error('Cards are not unlocked yet.');
+    if (finish.cardId !== null) {
+      if (typeof finish.cardId !== 'string') throw new Error('Invalid card ID');
+      if (!getCardChoices(order.id).some((card) => card.id === finish.cardId)) {
+        throw new Error(`Card ${finish.cardId} is not an authored choice for this order.`);
+      }
+    }
+    const unlocked = new Set(this._state.unlockedFlowerIds);
+    const counts: Record<string, number> = {};
+    for (const item of items) {
+      if (!unlocked.has(item.flowerId)) throw new Error(`Flower is locked: ${item.flowerId}`);
+      counts[item.flowerId] = (counts[item.flowerId] ?? 0) + 1;
+    }
+    for (const [flowerId, count] of Object.entries(counts)) {
+      if ((this._state.inventory[flowerId] ?? 0) < count) throw new Error(`Insufficient inventory for ${flowerId}.`);
+    }
+    const evaluation = evaluateBouquet(order, submission, { flags: this._state.flags });
+    const resultDialogueId = order.resultDialogueIds[evaluation.outcome];
     const result: DeliveryResult = {
       outcome: evaluation.outcome,
       reasonIds: evaluation.reasonIds,
@@ -313,85 +430,55 @@ export class GameSession {
       matchedRuleIds: evaluation.matchedRuleIds,
       resultDialogueId,
     };
+    const next = reduceGameState(this._state, {
+      type: 'completeOrder',
+      orderId: order.id,
+      bouquetFlowerIds: items.map((item) => item.flowerId),
+      effects: evaluation.effects,
+      outcome: evaluation.outcome,
+    });
+    this._state = { ...next, currentOrderId: order.id, activeDialogueId: resultDialogueId };
     this._lastDeliveryResult = result;
-
-    if (evaluation.outcome === 'accepted' || evaluation.outcome === 'resonant') {
-      this.dispatch({
-        type: 'completeOrder',
-        orderId: order.id,
-        bouquetFlowerIds: flowerIds,
-        effects: evaluation.effects,
-      });
-      // Show result dialogue before moving to next order
-      this._state = {
-        ...this._state,
-        currentOrderId: order.id,
-        activeDialogueId: resultDialogueId,
-      };
-    } else {
-      // Outcome is missed
-      if (options?.completeIfMissed) {
-        this.dispatch({
-          type: 'completeOrder',
-          orderId: order.id,
-          bouquetFlowerIds: flowerIds,
-          effects: evaluation.effects,
-        });
-        this._state = {
-          ...this._state,
-          currentOrderId: order.id,
-          activeDialogueId: resultDialogueId,
-        };
-      } else {
-        // Allow retry: keep inventory intact, show missed reaction
-        this._state = {
-          ...this._state,
-          activeDialogueId: resultDialogueId,
-        };
-      }
-    }
-
     this.persistInBackground();
     return result;
   }
 
-  public retryMissed(): void {
-    if (!this.currentOrder) return;
-    // Return to opening or ready dialogue to recompose
-    this.dispatch({
-      type: 'checkpoint',
-      orderId: this.currentOrder.id,
-      dialogueId: this.currentOrder.openingDialogueId,
-    });
-    this._lastDeliveryResult = undefined;
+  public askDetail(orderId: string): void {
+    const order = this.currentOrder;
+    if (!order || order.id !== orderId) throw new Error('Detail request does not match active order.');
+    const flag = `flag_heard_detail_${order.id}`;
+    if (this._state.flags[flag]) throw new Error('Order detail was already heard.');
+    const detailDialogueId = `dlg-${order.id}-detail`;
+    const detailNode = contentBundle.dialogue.find((d) => d.id === detailDialogueId);
+    this._state = {
+      ...this._state,
+      flags: { ...this._state.flags, [flag]: true },
+      activeDialogueId: detailNode ? detailNode.id : this._state.activeDialogueId,
+    };
+    if (detailNode) {
+      this.applyNodeEntryEffectsOnce(detailNode.id);
+    }
     this.persistInBackground();
+  }
+
+  public retryMissed(): void {
+    throw new Error('Submitted bouquets are final; missed orders cannot be retried.');
   }
 
   public advanceShift(): { shift: Shift; dayId: string } {
-    if (!this.isShiftComplete) {
-      throw new Error('Chưa hoàn thành tất cả đơn hàng trong buổi này.');
-    }
-
+    if (!this.isShiftComplete) throw new Error('Chưa hoàn thành tất cả đơn hàng trong buổi này.');
     if (this._state.currentShift === 'living') {
-      this.dispatch({
-        type: 'advanceShift',
-        shift: 'dead',
-      });
+      this.dispatch({ type: 'advanceShift', shift: 'dead' });
     } else {
-      // From dead shift -> start next day in living shift
-      this.dispatch({
-        type: 'advanceShift',
-        shift: 'living',
-        dayId: 'day-2',
-      });
+      const currentIndex = DAY_SEQUENCE.indexOf(this._state.currentDay as typeof DAY_SEQUENCE[number]);
+      const nextDay = DAY_SEQUENCE[currentIndex + 1];
+      if (!nextDay) return { shift: 'dead', dayId: this._state.currentDay };
+      this.dispatch({ type: 'advanceShift', shift: 'living', dayId: nextDay });
     }
-
     this.persistInBackground();
-    return {
-      shift: this._state.currentShift,
-      dayId: this._state.currentDay,
-    };
+    return { shift: this._state.currentShift, dayId: this._state.currentDay };
   }
+
 
   public applySettings(settings: Partial<GameSettings>): void {
     this.dispatch({

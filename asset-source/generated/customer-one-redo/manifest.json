@@ -1,0 +1,119 @@
+{
+  "archived": {
+    "source/03.png": {
+      "sha256": "23cfb6d19ac4987f23b4305128ea91eeb6740a3de93bf4d4eb4a1d9e2ab75273",
+      "size": 2857000
+    },
+    "public/03.webp": {
+      "sha256": "bc66e536c935569b292840b4a7ad0d32399b8f8dec4b87f3d0ecab733e864317",
+      "size": 410460
+    },
+    "source/04.png": {
+      "sha256": "73b25bf4063fd815fa880b489a73b8b68492a4d6da148fc30c14eed76a6f4a6e",
+      "size": 2771524
+    },
+    "public/04.webp": {
+      "sha256": "247899d9c3b982629684a46abddfeaa440f1e3daf3945f1aef8d25afed1f33d2",
+      "size": 409472
+    },
+    "source/05.png": {
+      "sha256": "b3fdf6516583d4ba17b1c496d28d5162aca422b9baa559870d451ebdb2334e48",
+      "size": 2873681
+    },
+    "public/05.webp": {
+      "sha256": "a6584d836bbdd695b0f4be2e13fa8b82d93dec6633d1543fae220a35ccd8aca8",
+      "size": 439974
+    }
+  },
+  "clones": [
+    {
+      "name": "01-clone",
+      "mood": "neutral-clone",
+      "file": "asset-source/generated/customer-one-redo/clones/01-clone.png",
+      "size": [
+        1148,
+        1371
+      ],
+      "bytes": 1379911,
+      "sha256": "57faff8ed221dbd9199bd375af06ed4a1d8b10206e74d266d5a320731117d139",
+      "referenceSha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd"
+    },
+    {
+      "name": "02-clone",
+      "mood": "happy-clone",
+      "file": "asset-source/generated/customer-one-redo/clones/02-clone.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "bytes": 909982,
+      "sha256": "c17fb7bdff4dc31145d44cfe760369a0948c2391ea212a6daec48f61290e72a5",
+      "referenceSha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd"
+    }
+  ],
+  "generations": [
+    {
+      "index": "03",
+      "mood": "sad",
+      "rawFile": "asset-source/generated/customer-one-redo/03.png",
+      "sourceFile": "asset-source/characters/customer-one/03.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceBytes": 882127,
+      "sourceSha256": "923898619f98cf9aae7752a8b0ba5953e47d225deae0b90a6f3b671da84c0637",
+      "runtimeFile": "public/assets/characters/customer-one/03.webp",
+      "runtimeSize": [
+        1200,
+        1200
+      ],
+      "runtimeBytes": 96230,
+      "runtimeSha256": "9b85c3a19539c4167947da4295b03f8f1acf49f2e932141728e55c5663b6b02d",
+      "reference": "asset-source/characters/customer-one/01.png",
+      "referenceSha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd"
+    },
+    {
+      "index": "04",
+      "mood": "touched",
+      "rawFile": "asset-source/generated/customer-one-redo/04.png",
+      "sourceFile": "asset-source/characters/customer-one/04.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceBytes": 929877,
+      "sourceSha256": "aad03144853c939c9230a6caeec74af67fbeb39066c05b808d96985863712745",
+      "runtimeFile": "public/assets/characters/customer-one/04.webp",
+      "runtimeSize": [
+        1200,
+        1200
+      ],
+      "runtimeBytes": 107932,
+      "runtimeSha256": "3c7408aa7d10091ff80d0fb6535c4b02f12c423db9bc97734271f689424dd503",
+      "reference": "asset-source/characters/customer-one/01.png",
+      "referenceSha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd"
+    },
+    {
+      "index": "05",
+      "mood": "surprised",
+      "rawFile": "asset-source/generated/customer-one-redo/05.png",
+      "sourceFile": "asset-source/characters/customer-one/05.png",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "sourceBytes": 883845,
+      "sourceSha256": "60f194b43aa6f3ef7ddd5c3408260406e8fd67c87b32537025e3e2f12da6dd88",
+      "runtimeFile": "public/assets/characters/customer-one/05.webp",
+      "runtimeSize": [
+        1200,
+        1200
+      ],
+      "runtimeBytes": 97994,
+      "runtimeSha256": "812b090b01a4d13df7579ede23cef60f8a5e44b929aab99df1a7c408e6522721",
+      "reference": "asset-source/characters/customer-one/01.png",
+      "referenceSha256": "746a10c9cb5a96a579014246c781fefb2a28cb6644180aa4ccfb0d3179d259bd"
+    }
+  ]
+}

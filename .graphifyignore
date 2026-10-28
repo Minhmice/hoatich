@@ -1,0 +1,15 @@
+.agents/
+.omp/
+.serena/
+.superpowers/
+.vite/
+node_modules/
+dist/
+dist-debug/
+graphify-out/
+DEMO_assets/
+asset-source/
+public/
+package-lock.json
+.next/
+out/

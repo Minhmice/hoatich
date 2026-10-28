@@ -1,5 +1,5 @@
 import { chapterIds, contentBundle, dayIds } from '../content';
-import type { GameSettings, GameState } from '../state/GameState';
+import type { GameSettings, GameState, NPCProgress } from '../state/GameState';
 
 const flowerIds: Record<string, true> = Object.fromEntries(contentBundle.flowers.map(({ id }) => [id, true]));
 const starterFlowerIds = contentBundle.flowers.filter(({ unlockFlag }) => unlockFlag === undefined).map(({ id }) => id);
@@ -63,8 +63,62 @@ function settings(value: unknown): GameSettings {
   return { textSpeed, fontScale, musicVolume, sfxVolume, reducedMotion: source.reducedMotion };
 }
 
+type BranchKind = NPCProgress['activeBranch'];
+
+function validateNpcProgress(value: unknown, relationships: Record<string, number>): Record<string, NPCProgress> {
+  if (value === undefined) throw new Error('npcProgress is required in schema 2');
+  const source = object(value, 'npcProgress');
+  const output: Record<string, NPCProgress> = {};
+  const valid = (branch: unknown): branch is BranchKind => branch === 'neutral' || branch === 'good' || branch === 'strained';
+  for (const customerId of Object.keys(customerIds)) {
+    if (source[customerId] === undefined) throw new Error(`npcProgress.${customerId} is missing`);
+    const entry = object(source[customerId], `npcProgress.${customerId}`);
+    const affinity = finite(entry.affinity, `npcProgress.${customerId}.affinity`);
+    if (affinity < 0 || affinity > 100) throw new Error(`npcProgress.${customerId}.affinity out of range`);
+    const deliveries = finite(entry.completedDeliveries, `npcProgress.${customerId}.completedDeliveries`);
+    if (!Number.isInteger(deliveries) || deliveries < 0) throw new Error(`npcProgress.${customerId}.completedDeliveries must be nonnegative integer`);
+    if (!valid(entry.activeBranch) || (entry.queuedBranch !== null && !valid(entry.queuedBranch))) throw new Error(`npcProgress.${customerId} branch is invalid`);
+    if (relationships[customerId] !== undefined && relationships[customerId] !== affinity) {
+      throw new Error(`relationshipScores.${customerId} does not match npcProgress affinity`);
+    }
+    relationships[customerId] = affinity;
+    output[customerId] = {
+      affinity,
+      completedDeliveries: deliveries,
+      activeBranch: entry.activeBranch,
+      queuedBranch: entry.queuedBranch,
+    };
+  }
+  for (const id of Object.keys(source)) if (!customerIds[id]) throw new Error(`npcProgress contains unknown customer ID: ${id}`);
+  return output;
+}
+
+function legacyNpcProgress(value: unknown, legacyRelationships: Record<string, number>): Record<string, NPCProgress> {
+  const source = value === undefined ? {} : object(value, 'npcProgress');
+  const output: Record<string, NPCProgress> = {};
+  const valid = (branch: unknown): branch is BranchKind => branch === 'neutral' || branch === 'good' || branch === 'strained';
+  for (const customerId of Object.keys(customerIds)) {
+    const entry = source[customerId] === undefined ? {} : object(source[customerId], `npcProgress.${customerId}`);
+    const affinityRaw = legacyRelationships[customerId] ?? entry.affinity ?? 50;
+    const deliveriesRaw = entry.completedDeliveries ?? 0;
+    const active = entry.activeBranch ?? 'neutral';
+    const queued = entry.queuedBranch ?? null;
+    if (!Number.isFinite(affinityRaw) || typeof affinityRaw !== 'number') throw new Error(`npcProgress.${customerId}.affinity must be finite`);
+    if (!Number.isInteger(deliveriesRaw) || typeof deliveriesRaw !== 'number' || deliveriesRaw < 0) throw new Error(`npcProgress.${customerId}.completedDeliveries must be nonnegative integer`);
+    if (!valid(active) || (queued !== null && !valid(queued))) throw new Error(`npcProgress.${customerId} branch is invalid`);
+    output[customerId] = {
+      affinity: Math.max(0, Math.min(100, affinityRaw)),
+      completedDeliveries: deliveriesRaw,
+      activeBranch: active,
+      queuedBranch: queued,
+    };
+  }
+  for (const id of Object.keys(source)) if (!customerIds[id]) throw new Error(`npcProgress contains unknown customer ID: ${id}`);
+  return output;
+}
+
 function validate(input: Record<string, unknown>): GameState {
-  if (input.schemaVersion !== 1) throw new Error('Unsupported save schema version');
+  if (input.schemaVersion !== 2) throw new Error('Unsupported save schema version');
   const currentShift = input.currentShift;
   if (currentShift !== 'living' && currentShift !== 'dead') throw new Error('currentShift is invalid');
   const currentChapter = string(input.currentChapter, 'currentChapter');
@@ -76,15 +130,19 @@ function validate(input: Record<string, unknown>): GameState {
   const completedOrderIds = uniqueIds(input.completedOrderIds, 'completedOrderIds', orderIds);
   const journalEntryIds = uniqueIds(input.journalEntryIds, 'journalEntryIds', journalIds);
   const relationships = recordNumbers(input.relationshipScores, 'relationshipScores', customerIds);
+  const npcProgress = validateNpcProgress(input.npcProgress, relationships);
   const rawFlags = object(input.flags, 'flags');
   const flags: Record<string, boolean | number | string> = {};
   for (const [id, value] of Object.entries(rawFlags)) {
-    if (!flagIds[id]) throw new Error(`flags contains unknown ID: ${id}`);
+    const legacyDialogueEffect = id.startsWith('dlg_effect_applied_') && Boolean(dialogueIds[id.slice('dlg_effect_applied_'.length)]);
+    const detailFlag = id.startsWith('flag_heard_detail_') && orderIds[id.slice('flag_heard_detail_'.length)];
+    if (!flagIds[id] && !legacyDialogueEffect && !detailFlag) throw new Error(`flags contains unknown ID: ${id}`);
     if (typeof value !== 'boolean' && typeof value !== 'string' && (typeof value !== 'number' || !Number.isFinite(value))) throw new Error(`flags.${id} is invalid`);
     flags[id] = value;
   }
+
   const state: GameState = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     savedAt: string(input.savedAt, 'savedAt'),
     currentChapter,
     currentDay,
@@ -93,34 +151,62 @@ function validate(input: Record<string, unknown>): GameState {
     unlockedFlowerIds,
     completedOrderIds,
     relationshipScores: relationships,
+    npcProgress,
     flags,
     journalEntryIds,
     settings: settings(input.settings),
   };
   if (input.currentOrderId !== undefined) state.currentOrderId = string(input.currentOrderId, 'currentOrderId');
   if (state.currentOrderId !== undefined && !orderIds[state.currentOrderId]) throw new Error('currentOrderId is unknown');
-  if (input.activeDialogueId !== undefined) state.activeDialogueId = string(input.activeDialogueId, 'activeDialogueId');
-  if (state.activeDialogueId !== undefined && !dialogueIds[state.activeDialogueId]) throw new Error('activeDialogueId is unknown');
+  if (input.activeDialogueId !== undefined) {
+    const dialogueId = string(input.activeDialogueId, 'activeDialogueId');
+    if (!dialogueIds[dialogueId]) throw new Error(`Unknown activeDialogueId: ${dialogueId}`);
+    state.activeDialogueId = dialogueId;
+  }
   return state;
 }
 
 export function migrateSave(input: unknown): GameState {
   const source = object(input, 'save');
   const version = source.schemaVersion === undefined ? 0 : source.schemaVersion;
-  if (version !== 0 && version !== 1) throw new Error(`Unsupported save schema version: ${String(version)}`);
-  if (version === 1) return validate(source);
-  const migrated: Record<string, unknown> = { ...source, schemaVersion: 1 };
+  if (version !== 0 && version !== 1 && version !== 2) throw new Error(`Unsupported save schema version: ${String(version)}`);
+  if (version === 2) return validate(source);
+  const migrated: Record<string, unknown> = { ...source, schemaVersion: 2 };
+  if (migrated.currentChapter === 'chuong-1') migrated.currentChapter = 'thang-mot';
   if (migrated.currentShift === undefined) migrated.currentShift = 'living';
   if (migrated.settings === undefined) migrated.settings = { ...defaultSettings };
   if (migrated.unlockedFlowerIds === undefined) {
     const inventory = object(migrated.inventory, 'inventory');
-    migrated.unlockedFlowerIds = [...new Set([...starterFlowerIds, ...Object.keys(inventory).filter((id) => flowerIds[id])])];
+    const inventoryIds = Object.keys(inventory).filter((id) => flowerIds[id]);
+    migrated.unlockedFlowerIds = inventoryIds.length > 0 ? [...new Set(inventoryIds)] : [...starterFlowerIds];
   }
-  for (const key of ['completedOrderIds', 'journalEntryIds'] as const) {
-    if (migrated[key] === undefined) migrated[key] = [];
-  }
+  for (const key of ['completedOrderIds', 'journalEntryIds'] as const) if (migrated[key] === undefined) migrated[key] = [];
   if (migrated.relationshipScores === undefined) migrated.relationshipScores = {};
   if (migrated.flags === undefined) migrated.flags = {};
+  const relScores = recordNumbers(migrated.relationshipScores, 'relationshipScores', customerIds);
+  const npcProg = legacyNpcProgress(migrated.npcProgress, relScores);
+  migrated.npcProgress = npcProg;
+  migrated.relationshipScores = Object.fromEntries(
+    Object.keys(customerIds).map((id) => [id, npcProg[id].affinity]),
+  );
+  if (migrated.activeDialogueId !== undefined) {
+    const dialogueId = String(migrated.activeDialogueId);
+    if (!dialogueIds[dialogueId]) {
+      if (migrated.currentOrderId && typeof migrated.currentOrderId === 'string' && orderIds[migrated.currentOrderId]) {
+        const activeOrder = contentBundle.orders.find((order) => order.id === migrated.currentOrderId);
+        const completedIds = Array.isArray(migrated.completedOrderIds) ? migrated.completedOrderIds : [];
+        if (activeOrder) {
+          migrated.activeDialogueId = completedIds.includes(activeOrder.id)
+            ? activeOrder.resultDialogueIds.accepted
+            : activeOrder.openingDialogueId;
+        } else {
+          delete migrated.activeDialogueId;
+        }
+      } else {
+        delete migrated.activeDialogueId;
+      }
+    }
+  }
   return validate(migrated);
 }
 

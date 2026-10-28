@@ -1,0 +1,98 @@
+[
+  {
+    "index": "04",
+    "mood": "sad",
+    "file": "asset-source/generated/player-redo/04.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "referenceSha256": "1417796fb4dd9a8ea4356380880cada320582e5f457e5ae80bd3e8256064a8d9",
+    "outputSha256": "ab53ef95e772bc9b3d81470d1fa61ccddc0d979e0debab8059e2d2e7f545776e",
+    "bytes": 851627,
+    "elapsedSeconds": 66,
+    "generatedAt": "2026-10-25T12:54:20.888Z",
+    "source": "asset-source/characters/player/04.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/player/04.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "dfc7fad00ac01392244d507af57d728bc16d310649e9efdb2bffb8248a0a7b07",
+    "runtimeBytes": 117364
+  },
+  {
+    "index": "05",
+    "mood": "angry",
+    "file": "asset-source/generated/player-redo/05.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "referenceSha256": "1417796fb4dd9a8ea4356380880cada320582e5f457e5ae80bd3e8256064a8d9",
+    "outputSha256": "57e052079c510b3b6d76c50dfc28c4e153a584303545fbab9a6f4bd85ba93016",
+    "bytes": 851295,
+    "elapsedSeconds": 85,
+    "generatedAt": "2026-10-25T12:55:46.180Z",
+    "source": "asset-source/characters/player/05.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/player/05.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "62637e839c390570a66035509236cc94bccbc9e3968cd33ab85bc1ed9efc95af",
+    "runtimeBytes": 114096
+  },
+  {
+    "index": "06",
+    "mood": "surprised",
+    "file": "asset-source/generated/player-redo/06.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "referenceSha256": "1417796fb4dd9a8ea4356380880cada320582e5f457e5ae80bd3e8256064a8d9",
+    "outputSha256": "18810e9fcc6b359a293e70a70d1c7d0a126b87ba268073d681374258d28f4ce7",
+    "bytes": 845339,
+    "elapsedSeconds": 52,
+    "generatedAt": "2026-10-25T12:56:37.800Z",
+    "source": "asset-source/characters/player/06.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/player/06.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "0ae1856a0bac5dd437977814ee1ec8644f29caa8763268208e485832fbdb4c1d",
+    "runtimeBytes": 113038
+  },
+  {
+    "index": "07",
+    "mood": "thinking",
+    "file": "asset-source/generated/player-redo/07.png",
+    "status": 200,
+    "model": "cx/gpt-image-2.5",
+    "referenceSha256": "1417796fb4dd9a8ea4356380880cada320582e5f457e5ae80bd3e8256064a8d9",
+    "outputSha256": "09d2d0bc757435868085079fe1980849ce89ca584c503f251ad2e11acd9ad018",
+    "bytes": 845600,
+    "elapsedSeconds": 50,
+    "generatedAt": "2026-10-25T12:57:27.651Z",
+    "source": "asset-source/characters/player/07.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "runtime": "public/assets/characters/player/07.webp",
+    "runtimeSize": [
+      1200,
+      1200
+    ],
+    "runtimeSha256": "35ab31e7a085d29359f3474057429a66d44e22b0cf186caab75fc417fad9165f",
+    "runtimeBytes": 112706
+  }
+]

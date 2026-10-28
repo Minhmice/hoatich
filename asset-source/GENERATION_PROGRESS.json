@@ -1,0 +1,386 @@
+{
+  "player_05_angry": {
+    "name": "Player Nữ - Tức giận / Bực mình",
+    "category": "character",
+    "outPng": "asset-source/characters/player/05.png",
+    "outWebp": "public/assets/characters/player/05.webp",
+    "sizeBytes": 391402,
+    "timestamp": "2026-10-25T11:15:36.613Z"
+  },
+  "player_06_surprised": {
+    "name": "Player Nữ - Ngạc nhiên / Sửng sốt",
+    "category": "character",
+    "outPng": "asset-source/characters/player/06.png",
+    "outWebp": "public/assets/characters/player/06.webp",
+    "sizeBytes": 380006,
+    "timestamp": "2026-10-25T11:16:20.155Z"
+  },
+  "player_07_thinking": {
+    "name": "Player Nữ - Đăm chiêu / Suy ngẫm",
+    "category": "character",
+    "outPng": "asset-source/characters/player/07.png",
+    "outWebp": "public/assets/characters/player/07.webp",
+    "sizeBytes": 370060,
+    "timestamp": "2026-10-25T11:17:08.239Z"
+  },
+  "passerby_03_pleased": {
+    "name": "Bà Cô Khó Tính - Hài lòng / Mỉm cười",
+    "category": "character",
+    "outPng": "asset-source/characters/passerby/03.png",
+    "outWebp": "public/assets/characters/passerby/03.webp",
+    "sizeBytes": 317704,
+    "timestamp": "2026-10-25T11:18:16.418Z"
+  },
+  "passerby_04_angry": {
+    "name": "Bà Cô Khó Tính - Giận dữ / Quở trách",
+    "category": "character",
+    "outPng": "asset-source/characters/passerby/04.png",
+    "outWebp": "public/assets/characters/passerby/04.webp",
+    "sizeBytes": 436884,
+    "timestamp": "2026-10-25T11:19:21.902Z"
+  },
+  "passerby_05_surprised": {
+    "name": "Bà Cô Khó Tính - Ngạc nhiên / Thẫn thờ",
+    "category": "character",
+    "outPng": "asset-source/characters/passerby/05.png",
+    "outWebp": "public/assets/characters/passerby/05.webp",
+    "sizeBytes": 378476,
+    "timestamp": "2026-10-25T11:20:20.291Z"
+  },
+  "customer_one_03_sad": {
+    "name": "Cô Gái Trẻ - U sầu / Buồn bã",
+    "category": "character",
+    "outPng": "asset-source/characters/customer-one/03.png",
+    "outWebp": "public/assets/characters/customer-one/03.webp",
+    "sizeBytes": 410460,
+    "timestamp": "2026-10-25T11:21:49.720Z"
+  },
+  "customer_one_04_touched": {
+    "name": "Cô Gái Trẻ - Xúc động / Cảm kích",
+    "category": "character",
+    "outPng": "asset-source/characters/customer-one/04.png",
+    "outWebp": "public/assets/characters/customer-one/04.webp",
+    "sizeBytes": 409472,
+    "timestamp": "2026-10-25T11:22:33.713Z"
+  },
+  "customer_one_05_surprised": {
+    "name": "Cô Gái Trẻ - Ngạc nhiên / Thích thú",
+    "category": "character",
+    "outPng": "asset-source/characters/customer-one/05.png",
+    "outWebp": "public/assets/characters/customer-one/05.webp",
+    "sizeBytes": 439974,
+    "timestamp": "2026-10-25T11:24:02.443Z"
+  },
+  "bac_ba_01_neutral": {
+    "name": "Bác Ba - Trầm mặc / Bình tĩnh",
+    "category": "character",
+    "outPng": "asset-source/characters/bac-ba/01.png",
+    "outWebp": "public/assets/characters/bac-ba/01.webp",
+    "sizeBytes": 383526,
+    "timestamp": "2026-10-25T11:25:12.782Z"
+  },
+  "bac_ba_02_sad": {
+    "name": "Bác Ba - U hoài / Nhớ vợ",
+    "category": "character",
+    "outPng": "asset-source/characters/bac-ba/02.png",
+    "outWebp": "public/assets/characters/bac-ba/02.webp",
+    "sizeBytes": 429600,
+    "timestamp": "2026-10-25T11:26:19.854Z"
+  },
+  "bac_ba_03_peaceful": {
+    "name": "Bác Ba - Thanh thản / Cảm kích",
+    "category": "character",
+    "outPng": "asset-source/characters/bac-ba/03.png",
+    "outWebp": "public/assets/characters/bac-ba/03.webp",
+    "sizeBytes": 461810,
+    "timestamp": "2026-10-25T11:27:04.369Z"
+  },
+  "spirit_poet_01_ethereal": {
+    "name": "Hồn Thi Sĩ - Hư ảo / Trầm mặc",
+    "category": "character",
+    "outPng": "asset-source/characters/spirit-poet/01.png",
+    "outWebp": "public/assets/characters/spirit-poet/01.webp",
+    "sizeBytes": 370146,
+    "timestamp": "2026-10-25T11:28:10.473Z"
+  },
+  "spirit_poet_02_sorrow": {
+    "name": "Hồn Thi Sĩ - U uất / Day dứt",
+    "category": "character",
+    "outPng": "asset-source/characters/spirit-poet/02.png",
+    "outWebp": "public/assets/characters/spirit-poet/02.webp",
+    "sizeBytes": 415338,
+    "timestamp": "2026-10-25T11:28:56.600Z"
+  },
+  "spirit_poet_03_peaceful": {
+    "name": "Hồn Thi Sĩ - Thanh thản / Siêu thoát",
+    "category": "character",
+    "outPng": "asset-source/characters/spirit-poet/03.png",
+    "outWebp": "public/assets/characters/spirit-poet/03.webp",
+    "sizeBytes": 414200,
+    "timestamp": "2026-10-25T11:29:45.522Z"
+  },
+  "rose_left": {
+    "name": "Hoa Hồng Đỏ - Nghiêng Trái",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/rose-left.png",
+    "outWebp": "public/assets/generated/flowers/variants/rose-left.webp",
+    "sizeBytes": 56786,
+    "timestamp": "2026-10-25T11:30:25.139Z"
+  },
+  "rose_right": {
+    "name": "Hoa Hồng Đỏ - Nghiêng Phải",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/rose-right.png",
+    "outWebp": "public/assets/generated/flowers/variants/rose-right.webp",
+    "sizeBytes": 69704,
+    "timestamp": "2026-10-25T11:31:02.128Z"
+  },
+  "rose_down": {
+    "name": "Hoa Hồng Đỏ - Chúc Xuống",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/rose-down.png",
+    "outWebp": "public/assets/generated/flowers/variants/rose-down.webp",
+    "sizeBytes": 72082,
+    "timestamp": "2026-10-25T11:31:40.886Z"
+  },
+  "rose_bud": {
+    "name": "Hoa Hồng Đỏ - Búp Nụ",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/rose-bud.png",
+    "outWebp": "public/assets/generated/flowers/variants/rose-bud.webp",
+    "sizeBytes": 52510,
+    "timestamp": "2026-10-25T11:32:24.888Z"
+  },
+  "lotus_left": {
+    "name": "Hoa Sen Hồng - Nghiêng Trái",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/lotus-left.png",
+    "outWebp": "public/assets/generated/flowers/variants/lotus-left.webp",
+    "sizeBytes": 42736,
+    "timestamp": "2026-10-25T11:33:12.103Z"
+  },
+  "lotus_right": {
+    "name": "Hoa Sen Hồng - Nghiêng Phải",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/lotus-right.png",
+    "outWebp": "public/assets/generated/flowers/variants/lotus-right.webp",
+    "sizeBytes": 55132,
+    "timestamp": "2026-10-25T11:34:09.455Z"
+  },
+  "lotus_down": {
+    "name": "Hoa Sen Hồng - Chúc Rủ Xuống",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/lotus-down.png",
+    "outWebp": "public/assets/generated/flowers/variants/lotus-down.webp",
+    "sizeBytes": 48748,
+    "timestamp": "2026-10-25T11:35:10.225Z"
+  },
+  "lotus_bud": {
+    "name": "Hoa Sen Hồng - Búp Sen",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/lotus-bud.png",
+    "outWebp": "public/assets/generated/flowers/variants/lotus-bud.webp",
+    "sizeBytes": 23802,
+    "timestamp": "2026-10-25T11:35:56.654Z"
+  },
+  "sunflower_left": {
+    "name": "Hoa Hướng Dương - Nghiêng Trái",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/sunflower-left.png",
+    "outWebp": "public/assets/generated/flowers/variants/sunflower-left.webp",
+    "sizeBytes": 99068,
+    "timestamp": "2026-10-25T11:36:49.982Z"
+  },
+  "sunflower_right": {
+    "name": "Hoa Hướng Dương - Nghiêng Phải",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/sunflower-right.png",
+    "outWebp": "public/assets/generated/flowers/variants/sunflower-right.webp",
+    "sizeBytes": 96534,
+    "timestamp": "2026-10-25T11:37:41.707Z"
+  },
+  "sunflower_down": {
+    "name": "Hoa Hướng Dương - Cúi Đầu Xuống",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/sunflower-down.png",
+    "outWebp": "public/assets/generated/flowers/variants/sunflower-down.webp",
+    "sizeBytes": 93206,
+    "timestamp": "2026-10-25T11:38:21.739Z"
+  },
+  "sunflower_bud": {
+    "name": "Hoa Hướng Dương - Búp Nụ",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/sunflower-bud.png",
+    "outWebp": "public/assets/generated/flowers/variants/sunflower-bud.webp",
+    "sizeBytes": 139202,
+    "timestamp": "2026-10-25T11:39:12.238Z"
+  },
+  "white_daisy_left": {
+    "name": "Hoa Cúc Trắng - Nghiêng Trái",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/white-daisy-left.png",
+    "outWebp": "public/assets/generated/flowers/variants/white-daisy-left.webp",
+    "sizeBytes": 49544,
+    "timestamp": "2026-10-25T11:40:00.432Z"
+  },
+  "white_daisy_right": {
+    "name": "Hoa Cúc Trắng - Nghiêng Phải",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/white-daisy-right.png",
+    "outWebp": "public/assets/generated/flowers/variants/white-daisy-right.webp",
+    "sizeBytes": 51938,
+    "timestamp": "2026-10-25T11:40:40.275Z"
+  },
+  "white_daisy_down": {
+    "name": "Hoa Cúc Trắng - Chúc Rủ Xuống",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/white-daisy-down.png",
+    "outWebp": "public/assets/generated/flowers/variants/white-daisy-down.webp",
+    "sizeBytes": 47888,
+    "timestamp": "2026-10-25T11:41:25.538Z"
+  },
+  "thuy_tien_left": {
+    "name": "Hoa Thủy Tiên - Nghiêng Trái",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/thuy-tien-left.png",
+    "outWebp": "public/assets/generated/flowers/variants/thuy-tien-left.webp",
+    "sizeBytes": 48900,
+    "timestamp": "2026-10-25T11:42:24.119Z"
+  },
+  "thuy_tien_right": {
+    "name": "Hoa Thủy Tiên - Nghiêng Phải",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/thuy-tien-right.png",
+    "outWebp": "public/assets/generated/flowers/variants/thuy-tien-right.webp",
+    "sizeBytes": 51272,
+    "timestamp": "2026-10-25T11:43:33.387Z"
+  },
+  "thuy_tien_down": {
+    "name": "Hoa Thủy Tiên - Chúc Xuống",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/thuy-tien-down.png",
+    "outWebp": "public/assets/generated/flowers/variants/thuy-tien-down.webp",
+    "sizeBytes": 57824,
+    "timestamp": "2026-10-25T11:44:25.591Z"
+  },
+  "luu_ly_left": {
+    "name": "Hoa Lưu Ly - Nghiêng Trái",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/luu-ly-left.png",
+    "outWebp": "public/assets/generated/flowers/variants/luu-ly-left.webp",
+    "sizeBytes": 121354,
+    "timestamp": "2026-10-25T11:45:28.123Z"
+  },
+  "luu_ly_right": {
+    "name": "Hoa Lưu Ly - Nghiêng Phải",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/luu-ly-right.png",
+    "outWebp": "public/assets/generated/flowers/variants/luu-ly-right.webp",
+    "sizeBytes": 168576,
+    "timestamp": "2026-10-25T11:46:42.163Z"
+  },
+  "luu_ly_down": {
+    "name": "Hoa Lưu Ly - Rủ Xuống",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/luu-ly-down.png",
+    "outWebp": "public/assets/generated/flowers/variants/luu-ly-down.webp",
+    "sizeBytes": 121332,
+    "timestamp": "2026-10-25T11:47:22.887Z"
+  },
+  "hoang_tuyen_left": {
+    "name": "Hoa Hoàng Tuyền - Uốn Trái",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/hoang-tuyen-left.png",
+    "outWebp": "public/assets/generated/flowers/variants/hoang-tuyen-left.webp",
+    "sizeBytes": 130152,
+    "timestamp": "2026-10-25T11:48:22.163Z"
+  },
+  "hoang_tuyen_right": {
+    "name": "Hoa Hoàng Tuyền - Uốn Phải",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/hoang-tuyen-right.png",
+    "outWebp": "public/assets/generated/flowers/variants/hoang-tuyen-right.webp",
+    "sizeBytes": 124002,
+    "timestamp": "2026-10-25T11:49:52.678Z"
+  },
+  "hoang_tuyen_down": {
+    "name": "Hoa Hoàng Tuyền - Chúc Rủ Xuống",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/hoang-tuyen-down.png",
+    "outWebp": "public/assets/generated/flowers/variants/hoang-tuyen-down.webp",
+    "sizeBytes": 128558,
+    "timestamp": "2026-10-25T11:50:53.101Z"
+  },
+  "da_ngan_left": {
+    "name": "Hoa Dạ Ngân - Nghiêng Trái Phát Sáng",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/da-ngan-left.png",
+    "outWebp": "public/assets/generated/flowers/variants/da-ngan-left.webp",
+    "sizeBytes": 127636,
+    "timestamp": "2026-10-25T11:51:34.156Z"
+  },
+  "da_ngan_right": {
+    "name": "Hoa Dạ Ngân - Nghiêng Phải Phát Sáng",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/da-ngan-right.png",
+    "outWebp": "public/assets/generated/flowers/variants/da-ngan-right.webp",
+    "sizeBytes": 125774,
+    "timestamp": "2026-10-25T11:52:29.627Z"
+  },
+  "da_ngan_down": {
+    "name": "Hoa Dạ Ngân - Rủ Xuống Dịu Dàng",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/da-ngan-down.png",
+    "outWebp": "public/assets/generated/flowers/variants/da-ngan-down.webp",
+    "sizeBytes": 74996,
+    "timestamp": "2026-10-25T11:53:09.603Z"
+  },
+  "lavender_left": {
+    "name": "Hoa Oải Hương - Nghiêng Trái",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/lavender-left.png",
+    "outWebp": "public/assets/generated/flowers/variants/lavender-left.webp",
+    "sizeBytes": 38632,
+    "timestamp": "2026-10-25T11:54:07.458Z"
+  },
+  "lavender_right": {
+    "name": "Hoa Oải Hương - Nghiêng Phải",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/lavender-right.png",
+    "outWebp": "public/assets/generated/flowers/variants/lavender-right.webp",
+    "sizeBytes": 47014,
+    "timestamp": "2026-10-25T11:54:48.955Z"
+  },
+  "lavender_down": {
+    "name": "Hoa Oải Hương - Rủ Xuống",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/lavender-down.png",
+    "outWebp": "public/assets/generated/flowers/variants/lavender-down.webp",
+    "sizeBytes": 51112,
+    "timestamp": "2026-10-25T11:55:39.325Z"
+  },
+  "carnation_left": {
+    "name": "Hoa Cẩm Chướng - Nghiêng Trái",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/carnation-left.png",
+    "outWebp": "public/assets/generated/flowers/variants/carnation-left.webp",
+    "sizeBytes": 54042,
+    "timestamp": "2026-10-25T11:56:24.146Z"
+  },
+  "carnation_right": {
+    "name": "Hoa Cẩm Chướng - Nghiêng Phải",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/carnation-right.png",
+    "outWebp": "public/assets/generated/flowers/variants/carnation-right.webp",
+    "sizeBytes": 58874,
+    "timestamp": "2026-10-25T11:57:10.799Z"
+  },
+  "carnation_down": {
+    "name": "Hoa Cẩm Chướng - Chúc Rủ Xuống",
+    "category": "flower",
+    "outPng": "asset-source/generated/flowers/variants/carnation-down.png",
+    "outWebp": "public/assets/generated/flowers/variants/carnation-down.webp",
+    "sizeBytes": 54030,
+    "timestamp": "2026-10-25T11:58:03.252Z"
+  }
+}

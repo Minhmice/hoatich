@@ -1,0 +1,130 @@
+{
+  "archived": {
+    "source/03.png": {
+      "sha256": "e81766bbff03b579e722a8be778a1d1e1e423344bc9ed27af2dcbbdcbcbb7ecf",
+      "size": 2986815
+    },
+    "source/04.png": {
+      "sha256": "4e3846953f07111dfcdc629ae8c55cd44f82729d727ea17ba54fbd11974e216e",
+      "size": 2615646
+    },
+    "source/05.png": {
+      "sha256": "2029cba6facd068c952e71f6d2ddf46bef635d3f6cbafa6076cf5a4e20342740",
+      "size": 2665518
+    },
+    "public/03.webp": {
+      "sha256": "78de68bf2886f76c70a822d191c0af44263bccf6b0de12c8e55c3cbefec651c6",
+      "size": 317704
+    },
+    "public/04.webp": {
+      "sha256": "48e45824b9ebe11bbff15e8d42fffb3231e5d5f8752260c71189a61ca8d76530",
+      "size": 436884
+    },
+    "public/05.webp": {
+      "sha256": "e163b1f85215a926cc7a1552e3144aca68cf80bf8af3947d35db083c5f0685cb",
+      "size": 378476
+    }
+  },
+  "generations": [
+    {
+      "index": "03",
+      "mood": "happy",
+      "file": "asset-source/generated/passerby-redo/03.png",
+      "status": 200,
+      "model": "cx/gpt-image-2.5",
+      "referenceSha256": "9a5b9dfa7f8219d38ac5c8e1a74d5022c2739c0fd8b0a1394da53ed9f1b022fc",
+      "outputSha256": "d332fc7228f32f536fcb020948f45051aac5e598b71ddb42a0132936c37e4dff",
+      "bytes": 699676,
+      "elapsedSeconds": 51,
+      "generatedAt": "2026-10-25T13:40:49.039031+00:00",
+      "source": "asset-source/characters/passerby/03.png",
+      "sourceSize": [
+        1199,
+        1312
+      ],
+      "runtime": "public/assets/characters/passerby/03.webp",
+      "runtimeSize": [
+        1096,
+        1200
+      ],
+      "runtimeSha256": "3474fe047e02d579e2a8b0aef008125ab1a91e76b9259d54e4c858465b13e96e",
+      "runtimeBytes": 96086
+    },
+    {
+      "index": "04",
+      "mood": "angry",
+      "file": "asset-source/generated/passerby-redo/04.png",
+      "status": 200,
+      "model": "cx/gpt-image-2.5",
+      "referenceSha256": "9a5b9dfa7f8219d38ac5c8e1a74d5022c2739c0fd8b0a1394da53ed9f1b022fc",
+      "outputSha256": "eed723f8ec86966fb7b9ec03c7b1c637476a50462f569ea985be921eaf6bb978",
+      "bytes": 688636,
+      "elapsedSeconds": 33,
+      "generatedAt": "2026-10-25T13:40:49.039407+00:00",
+      "source": "asset-source/characters/passerby/04.png",
+      "sourceSize": [
+        1199,
+        1312
+      ],
+      "runtime": "public/assets/characters/passerby/04.webp",
+      "runtimeSize": [
+        1096,
+        1200
+      ],
+      "runtimeSha256": "48b9b769b13022c50e06173829a2f35930768558f017ba80fd94d78be1784200",
+      "runtimeBytes": 91918
+    },
+    {
+      "index": "05",
+      "mood": "surprised",
+      "file": "asset-source/generated/passerby-redo/05.png",
+      "status": 200,
+      "model": "cx/gpt-image-2.5",
+      "referenceSha256": "9a5b9dfa7f8219d38ac5c8e1a74d5022c2739c0fd8b0a1394da53ed9f1b022fc",
+      "outputSha256": "c01c2251a0ea3ebb04b31240238e790f40038b3ab9b2b2a6bb6fb5f89bef4c4b",
+      "bytes": 677738,
+      "elapsedSeconds": 47,
+      "generatedAt": "2026-10-25T13:43:27.569621+00:00",
+      "source": "asset-source/characters/passerby/05.png",
+      "sourceSize": [
+        1199,
+        1312
+      ],
+      "runtime": "public/assets/characters/passerby/05.webp",
+      "runtimeSize": [
+        1096,
+        1200
+      ],
+      "runtimeSha256": "de80f96de30529810148502887865f30f9ac995aea3879007ee993ea9fd4b920",
+      "runtimeBytes": 87578
+    }
+  ],
+  "clones": [
+    {
+      "clone": "01",
+      "file": "asset-source/generated/passerby-redo/clones/01.png",
+      "mood": "skeptical",
+      "status": 200,
+      "elapsedSeconds": 54,
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "dc93bd91bc2e50d43bcf5b9f9f5ff335214de5058cd9c1ccb6bc75d72a7403f0",
+      "bytes": 718333
+    },
+    {
+      "clone": "02",
+      "file": "asset-source/generated/passerby-redo/clones/02.png",
+      "mood": "neutral",
+      "status": 200,
+      "elapsedSeconds": 52,
+      "size": [
+        1199,
+        1312
+      ],
+      "sha256": "2edbd58a92103809a84a20ccddd2fce27b0d547e33eaf3a627be6e919af961b9",
+      "bytes": 762432
+    }
+  ]
+}
